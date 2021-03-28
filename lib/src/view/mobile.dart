@@ -150,14 +150,17 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
                 ),
               )
               .toSet(),
-          gestureRecognizers: widget.mobileSpecificParams.mobileGestureRecognizers,
+          gestureRecognizers:
+              widget.mobileSpecificParams.mobileGestureRecognizers,
           onPageStarted: widget.onPageStarted,
           onPageFinished: widget.onPageFinished,
           initialMediaPlaybackPolicy: widget.initialMediaPlaybackPolicy,
           onWebResourceError: widget.onWebResourceError,
-          gestureNavigationEnabled: widget.mobileSpecificParams.gestureNavigationEnabled,
+          gestureNavigationEnabled:
+              widget.mobileSpecificParams.gestureNavigationEnabled,
           debuggingEnabled: widget.mobileSpecificParams.debuggingEnabled,
-          navigationDelegate: (request) => widget.mobileSpecificParams.navigationDelegate(
+          navigationDelegate: (request) =>
+              widget.mobileSpecificParams.navigationDelegate(
             NavigationRequest(
               content: request.url,
               isForMainFrame: request.isForMainFrame,

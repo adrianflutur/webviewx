@@ -3,7 +3,8 @@ library webviewx;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/platform_interface.dart' show WebResourceError;
-import 'package:webview_flutter/webview_flutter.dart' hide WebView, WebViewController;
+import 'package:webview_flutter/webview_flutter.dart'
+    hide WebView, WebViewController;
 import 'src/view/view.dart';
 import 'src/controller/controller.dart';
 import 'src/utils/utils.dart';

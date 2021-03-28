@@ -104,7 +104,8 @@ class _WebViewXPageState extends State<WebViewXPage> {
 
   void _callPlatformSpecificJsMethod() async {
     try {
-      await webviewController.callJsMethod('testPlatformSpecificMethod', ['Hi']);
+      await webviewController
+          .callJsMethod('testPlatformSpecificMethod', ['Hi']);
     } catch (e) {
       showAlertDialog(
         executeJsErrorMessage,
@@ -213,7 +214,8 @@ class _WebViewXPageState extends State<WebViewXPage> {
         ],
       ),
       createButton(
-        text: 'Change content to URL that allows iframes embedding (https://flutter.dev)',
+        text:
+            'Change content to URL that allows iframes embedding (https://flutter.dev)',
         onTap: _setUrl,
       ),
       createButton(
@@ -242,7 +244,8 @@ class _WebViewXPageState extends State<WebViewXPage> {
         onTap: _callPlatformIndependentJsMethod,
       ),
       createButton(
-        text: 'Call platform specific Js method, that calls back a Dart function',
+        text:
+            'Call platform specific Js method, that calls back a Dart function',
         onTap: _callPlatformSpecificJsMethod,
       ),
       createButton(

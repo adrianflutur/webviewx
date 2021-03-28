@@ -54,7 +54,8 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// Returns true if the webview's current content is URL, and if
   /// [SourceType] is [SourceType.URL_BYPASS], which means it should
   /// use the bypass to fetch the web page content.
-  bool get isCurrentContentURLBypass => value.sourceType == SourceType.URL_BYPASS;
+  bool get isCurrentContentURLBypass =>
+      value.sourceType == SourceType.URL_BYPASS;
 
   /// Set webview content to the specified URL.
   /// Example URL: https://flutter.dev
