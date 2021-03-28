@@ -351,8 +351,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
       ..height = widget.height.toInt().toString()
       ..allowFullscreen = widget.webSpecificParams.webAllowFullscreenContent;
 
-    widget.webSpecificParams.additionalSandboxOptions
-        .forEach(iframeElement.sandbox.add);
+    widget.webSpecificParams.additionalSandboxOptions.forEach(iframeElement.sandbox.add);
 
     if (widget.javascriptMode == JavascriptMode.unrestricted) {
       iframeElement.sandbox.add('allow-scripts');
@@ -360,8 +359,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
     var allow = widget.webSpecificParams.additionalAllowOptions;
 
-    if (widget.initialMediaPlaybackPolicy ==
-        AutoMediaPlaybackPolicy.always_allow) {
+    if (widget.initialMediaPlaybackPolicy == AutoMediaPlaybackPolicy.always_allow) {
       allow.add('autoplay');
     }
 
@@ -386,12 +384,6 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
   // the connection must be remade in order to
   // add the connector to the controller (connector that
   // allows you to call JS methods)
-  //
-  // When the content changes from HTML to URL,
-  // we need to use a Div element wrapper, so that we remove
-  // the iframe from inside the Div, and re-add a new iframe
-  // in order to reinitialize the iframe only using the "src", not "srcdoc"
-  // because srcdoc overrides src, and it cannot be removed afterwards.
   void _handleChange() {
     var newContentModel = webViewXController.value;
 
@@ -456,10 +448,8 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
               headers[USER_AGENT_HEADERS_KEY] = widget.userAgent;
             }
             var options = jsonEncode(headers);
-            var optionsIndicator =
-                '[$BYPASS_URL_ADDITIONAL_OPTIONS_STARTING_POINT]';
-            var url =
-                source + optionsIndicator + base64Encode(utf8.encode(options));
+            var optionsIndicator = '[$BYPASS_URL_ADDITIONAL_OPTIONS_STARTING_POINT]';
+            var url = source + optionsIndicator + base64Encode(utf8.encode(options));
 
             //TODO Issue: On web, this only works the first time being used. When the user clicks a link,
             // theese options are lost.
