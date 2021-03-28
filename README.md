@@ -183,7 +183,7 @@ While this package aims to put together the best of both worlds, there are diffe
 
   This might seem like a hack, and it really is, but I couldn't find any other way to make the iframe behave similar to the mobile webview (which is some kind of an actual browser, that's why everything works there by default).
 
-  Also, it should work on Safari too, as stated [here](https://github.com/niutech/x-frame-bypass).
+  Also, it might not work on Safari, as stated [here](https://github.com/niutech/x-frame-bypass).
 
 - Web navigation
 
