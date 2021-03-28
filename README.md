@@ -87,7 +87,7 @@ This does nothing on mobile, but on web it allows widgets on top to intercept ge
 
 Also, as a side note: If you happen to add widgets on top of the webview, wrap them and then you notice that the iframe still reloads unexpectedly, you should check if there are other widgets that sit on top without being noticed, or try to wrap InkWell, GestureRecognizer or Button widgets to see which one causes the problem.
 
-3. Interact with the controller (run the [example app]() to see how does it work)
+3. Interact with the controller (run the [example app](https://github.com/adrianflutur/webviewx/tree/main/example) to see how does it work)
 
 ```dart
 webviewController.loadContent(
