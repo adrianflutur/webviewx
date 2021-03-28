@@ -105,6 +105,8 @@ webviewController.goForward();
 
 ## Features
 
+Note: For instructions on how to use theese features, please see each one's documentation, located inside it's coresponding class.
+
 - ### Widget properties
 
 | Feature                                                    | Details                                                                                                                                             |
@@ -211,7 +213,7 @@ This package wouldn't be possible without the following:
 
 - [webview_flutter](https://github.com/flutter/plugins/tree/master/packages/webview_flutter) for the mobile version
 - [easy_web_view](https://github.com/rodydavis/easy_web_view) for ideas and starting point for the web version
-- [pointer_interceptor](https://pub.dev/packages/pointer_interceptor) for fixing iframe issues when other widgets are on top of it (see [above](#important))
+- [pointer_interceptor](https://pub.dev/packages/pointer_interceptor) for fixing iframe issues when other widgets are on top of it (see [above](#important-))
 - [x-frame-bypass](https://github.com/niutech/x-frame-bypass) for allowing the iframe to bypass websites' X-Frame-Options: deny/same-origin headers, thus allowing us to load any webpage (just like on mobile)
 - https://cors.bridged.cc/ for the free CORS proxy
 - https://api.codetabs.com/ for the free CORS proxy
