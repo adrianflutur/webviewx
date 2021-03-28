@@ -10,7 +10,7 @@ A feature-rich cross-platform webview using [webview_flutter](https://pub.dev/pa
 
 - [Gallery](#gallery)
 - [Basic usage](#basic-usage)
-- [Features](#Features)
+- [Features](#features)
   - [Widget properties](#widget-properties)
   - [Controller properties](#controller-properties)
 - [Limitations and notes](#limitations-and-notes)
