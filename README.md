@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/docs/images/webviewx_logo.png" height="400" alt="webviewx" />
+<img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/doc/images/webviewx_logo.png" height="400" alt="webviewx" />
 </p>
 
 [![pub package](https://shields.io/pub/v/webviewx.svg)](https://pub.dev/packages/webviewx)
@@ -30,13 +30,13 @@ A feature-rich cross-platform webview using [webview_flutter](https://pub.dev/pa
                 <p> Mobile</p>
             </td>
             <td style="text-align: center">
-                <a href="https://raw.githubusercontent.com/adrianflutur/webviewx/master/docs/gifs/mobile_1.gif">
-                    <img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/docs/gifs/mobile_1.gif" width="200"/>
+                <a href="https://raw.githubusercontent.com/adrianflutur/webviewx/master/doc/gifs/mobile_1.gif">
+                    <img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/doc/gifs/mobile_1.gif" width="200"/>
                 </a>
             </td>            
             <td style="text-align: center">
-                <a href="https://raw.githubusercontent.com/adrianflutur/webviewx/master/docs/gifs/mobile_2.gif">
-                    <img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/docs/gifs/mobile_2.gif" width="200"/>
+                <a href="https://raw.githubusercontent.com/adrianflutur/webviewx/master/doc/gifs/mobile_2.gif">
+                    <img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/doc/gifs/mobile_2.gif" width="200"/>
                 </a>
             </td>
         </tr>
@@ -45,12 +45,12 @@ A feature-rich cross-platform webview using [webview_flutter](https://pub.dev/pa
                 <p> Web</p>
             </td>
             <td style="text-align: center">
-                <a href="https://raw.githubusercontent.com/adrianflutur/webviewx/master/docs/gifs/web_1.gif">
-                    <img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/docs/gifs/web_1.gif" width="200"/>
+                <a href="https://raw.githubusercontent.com/adrianflutur/webviewx/master/doc/gifs/web_1.gif">
+                    <img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/doc/gifs/web_1.gif" width="200"/>
                 </a>
             <td style="text-align: center">
-                <a href="https://raw.githubusercontent.com/adrianflutur/webviewx/master/docs/gifs/web_2.gif">
-                    <img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/docs/gifs/web_2.gif" width="200"/>
+                <a href="https://raw.githubusercontent.com/adrianflutur/webviewx/master/doc/gifs/web_2.gif">
+                    <img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/doc/gifs/web_2.gif" width="200"/>
                 </a>
             </td>
         </tr>

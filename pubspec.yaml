@@ -5,7 +5,7 @@ version: 0.0.1
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
-  flutter: ">=1.17.0 <2.0.0"
+  flutter: ">=1.17.0"
 
 dependencies:
   flutter:
@@ -15,6 +15,8 @@ dependencies:
   pointer_interceptor: ^0.8.0+1
   pedantic: ^1.9.2
   uuid: ^2.2.2
+  meta: ^1.2.2
+  path: ^1.7.0
 
 dev_dependencies:
   flutter_test:
