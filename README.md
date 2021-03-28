@@ -140,7 +140,9 @@ Note: For instructions on how to use theese features, please see each one's docu
 | Load HTML from string                                     | webviewController.`loadContent(HTML, SourceType.HTML)`                                         |
 | Load HTML from assets                                     | webviewController.`loadContent(HTML, SourceType.HTML, fromAssets: true)`                       |
 | Check if you can go back in history                       | `await` webviewController.`canGoBack()`                                                        |
+| Go back in history                                        | `await` webviewController.`goBack()`                                                           |
 | Check if you can go forward in history                    | `await` webviewController.`canGoForward()`                                                     |
+| Go forward in history                                     | `await` webviewController.`goForward()`                                                        |
 | Reload current content                                    | webviewController.`reload()`                                                                   |
 | Check if all gestures are ignored                         | webviewController.`ignoringAllGestures`                                                        |
 | Set ignore all gestures                                   | webviewController.`setIgnoreAllGestures(value)`                                                |
