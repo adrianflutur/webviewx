@@ -105,7 +105,8 @@ class HtmlUtils {
   /// Encodes an image (as a list of bytes) to a base64 embedded HTML image
   ///
   /// Pretty raw, I know, but it works
-  static String encodeImageAsEmbeddedBase64(String fileName, Uint8List imageBytes) {
+  static String encodeImageAsEmbeddedBase64(
+      String fileName, Uint8List imageBytes) {
     var imageWidth = '100%';
     var base64Image = '<img width=\"$imageWidth\" src=\"data:image/png;base64, '
         '${base64Encode(imageBytes)}\" data-filename=\"$fileName\">';
@@ -151,7 +152,8 @@ class HtmlUtils {
     var newLine = '\n';
     var scriptOpenTag = '<script>';
     var scriptCloseTag = '</script>';
-    var jsContent = jsContents.reduce((prev, elem) => prev + newLine * 2 + elem);
+    var jsContent =
+        jsContents.reduce((prev, elem) => prev + newLine * 2 + elem);
 
     var whatToEmbed = newLine +
         scriptOpenTag +
@@ -209,7 +211,8 @@ class HtmlUtils {
   /// the last one of them. This is because the last one that renders on the screen
   /// will also call latter iframes' "connect_js_to_flutter" callbacks, thus messing up
   /// others' functions and, well, everything.
-  static String embedWebIframeJsConnector(String source, String windowDisambiguator) {
+  static String embedWebIframeJsConnector(
+      String source, String windowDisambiguator) {
     return embedJsInHtmlSource(
       source,
       {
