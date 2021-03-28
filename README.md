@@ -1,5 +1,5 @@
 <p align="center">
-<img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/docs/images/webviewx_logo.png" height="150" alt="webviewx" />
+<img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/docs/images/webviewx_logo.png" height="400" alt="webviewx" />
 </p>
 
 [![pub package](https://shields.io/pub/v/webviewx.svg)](https://pub.dev/packages/webviewx)
