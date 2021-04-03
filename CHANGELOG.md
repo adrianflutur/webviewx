@@ -3,6 +3,7 @@
 - Fixed more analyzer warnings
 - Fixed unidentified platform issue
 - Improved code in the mobile version
+- Bumped dependencies version
 
 ## 0.0.2
 

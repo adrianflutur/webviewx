@@ -13,7 +13,7 @@ dependencies:
 
   webview_flutter: ^2.0.3
   pointer_interceptor: ^0.9.0
-  pedantic: ^1.9.2
+  pedantic: ^1.11.0
   uuid: ^3.0.3
   meta: ^1.2.2
   path: ^1.7.0
