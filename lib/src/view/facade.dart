@@ -1,13 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/platform_interface.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webviewx/src/controller/controller.dart';
-import 'package:webviewx/src/utils/dart_callback.dart';
-import 'package:webviewx/src/utils/embedded_js_content.dart';
-import 'package:webviewx/src/utils/mobile_specific_params.dart';
-import 'package:webviewx/src/utils/source_type.dart';
-import 'package:webviewx/src/utils/web_specific_params.dart';
+import 'package:webviewx/src/utils/utils.dart';
 
 /// Facade widget
 ///

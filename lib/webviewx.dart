@@ -2,18 +2,12 @@ library webviewx;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/platform_interface.dart' show WebResourceError;
-import 'package:webview_flutter/webview_flutter.dart'
-    hide WebView, WebViewController;
 import 'src/view/view.dart';
 import 'src/controller/controller.dart';
 import 'src/utils/utils.dart';
 
 export 'src/controller/controller.dart';
 export 'src/utils/utils.dart';
-export 'package:webview_flutter/platform_interface.dart' show WebResourceError;
-export 'package:webview_flutter/webview_flutter.dart'
-    hide WebView, WebViewController, NavigationRequest, NavigationDelegate;
 
 /// Top-level wrapper for WebViewX.
 /// Basically it's a layout builder that makes sure the webview can still render

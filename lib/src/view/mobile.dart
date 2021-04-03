@@ -1,16 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:webview_flutter/platform_interface.dart';
-import 'package:webview_flutter/webview_flutter.dart' hide NavigationRequest;
-import 'package:webviewx/src/controller/controller.dart';
-import 'package:webviewx/src/utils/dart_callback.dart';
-import 'package:webviewx/src/utils/embedded_js_content.dart';
-import 'package:webviewx/src/utils/html_utils.dart';
-import 'package:webviewx/src/utils/mobile_specific_params.dart';
-import 'package:webviewx/src/utils/navigation_request.dart';
-import 'package:webviewx/src/utils/source_type.dart';
+import 'package:webviewx/src/utils/utils.dart';
 import 'package:webviewx/src/utils/view_content_model.dart';
-import 'package:webviewx/src/utils/web_specific_params.dart';
+import 'package:webviewx/src/controller/controller.dart';
+import 'package:webview_flutter/platform_interface.dart' as wf_pi;
+import 'package:webview_flutter/webview_flutter.dart' as wf;
 
 /// Mobile implementation
 class WebViewXWidget extends StatefulWidget {
@@ -111,7 +105,7 @@ class WebViewXWidget extends StatefulWidget {
 }
 
 class _WebViewXWidgetState extends State<WebViewXWidget> {
-  WebViewController originalWebViewController;
+  wf.WebViewController originalWebViewController;
   WebViewXController webViewXController;
 
   bool _ignoreAllGestures;
@@ -126,52 +120,81 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Widget webview = SizedBox(
-        width: widget.width,
-        height: widget.height,
-        child: WebView(
-          key: widget?.key,
-          initialUrl: _initialContent(),
-          javascriptMode: widget.javascriptMode,
-          onWebViewCreated: (webViewController) {
-            originalWebViewController = webViewController;
-
-            webViewXController.connector = originalWebViewController;
-            // Calls onWebViewCreated to pass the refference upstream
-            if (widget.onWebViewCreated != null) {
-              widget.onWebViewCreated(webViewXController);
-            }
-          },
-          javascriptChannels: widget.dartCallBacks
-              .map(
-                (cb) => JavascriptChannel(
-                  name: cb.name,
-                  onMessageReceived: (msg) => cb.callBack(msg.message),
+    final javascriptMode = wf.JavascriptMode.values.singleWhere(
+      (value) => value.toString() == widget.javascriptMode.toString(),
+    );
+    final initialMediaPlaybackPolicy =
+        wf.AutoMediaPlaybackPolicy.values.singleWhere(
+      (value) =>
+          value.toString() == widget.initialMediaPlaybackPolicy.toString(),
+    );
+    final onWebResourceError =
+        (wf_pi.WebResourceError err) => widget.onWebResourceError(
+              WebResourceError(
+                description: err.description,
+                errorCode: err.errorCode,
+                domain: err.domain,
+                errorType: WebResourceErrorType.values.singleWhere(
+                  (value) => value.toString() == err.errorType.toString(),
                 ),
-              )
-              .toSet(),
-          gestureRecognizers:
-              widget.mobileSpecificParams.mobileGestureRecognizers,
-          onPageStarted: widget.onPageStarted,
-          onPageFinished: widget.onPageFinished,
-          initialMediaPlaybackPolicy: widget.initialMediaPlaybackPolicy,
-          onWebResourceError: widget.onWebResourceError,
-          gestureNavigationEnabled:
-              widget.mobileSpecificParams.gestureNavigationEnabled,
-          debuggingEnabled: widget.mobileSpecificParams.debuggingEnabled,
-          navigationDelegate: (request) =>
-              widget.mobileSpecificParams.navigationDelegate(
-            NavigationRequest(
-              content: request.url,
-              isForMainFrame: request.isForMainFrame,
-            ),
+                failingUrl: err.failingUrl,
+              ),
+            );
+    final navigationDelegate = (wf.NavigationRequest request) async {
+      var delegate = await widget.mobileSpecificParams.navigationDelegate(
+        NavigationRequest(
+          content: request.url,
+          isForMainFrame: request.isForMainFrame,
+        ),
+      );
+      return wf.NavigationDecision.values.singleWhere(
+        (value) => value.toString() == delegate.toString(),
+      );
+    };
+    final onWebViewCreated = (wf.WebViewController webViewController) {
+      originalWebViewController = webViewController;
+
+      webViewXController.connector = originalWebViewController;
+      // Calls onWebViewCreated to pass the refference upstream
+      if (widget.onWebViewCreated != null) {
+        widget.onWebViewCreated(webViewXController);
+      }
+    };
+    final javascriptChannels = widget.dartCallBacks
+        .map(
+          (cb) => wf.JavascriptChannel(
+            name: cb.name,
+            onMessageReceived: (msg) => cb.callBack(msg.message),
           ),
-          userAgent: widget.userAgent,
-        ));
+        )
+        .toSet();
+
+    Widget webview = SizedBox(
+      width: widget.width,
+      height: widget.height,
+      child: wf.WebView(
+        key: widget?.key,
+        initialUrl: _initialContent(),
+        javascriptMode: javascriptMode,
+        onWebViewCreated: onWebViewCreated,
+        javascriptChannels: javascriptChannels,
+        gestureRecognizers:
+            widget.mobileSpecificParams.mobileGestureRecognizers,
+        onPageStarted: widget.onPageStarted,
+        onPageFinished: widget.onPageFinished,
+        initialMediaPlaybackPolicy: initialMediaPlaybackPolicy,
+        onWebResourceError: onWebResourceError,
+        gestureNavigationEnabled:
+            widget.mobileSpecificParams.gestureNavigationEnabled,
+        debuggingEnabled: widget.mobileSpecificParams.debuggingEnabled,
+        navigationDelegate: navigationDelegate,
+        userAgent: widget.userAgent,
+      ),
+    );
 
     return IgnorePointer(
-      child: webview,
       ignoring: _ignoreAllGestures,
+      child: webview,
     );
   }
 

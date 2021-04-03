@@ -1,14 +1,6 @@
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'package:webview_flutter/webview_flutter.dart'
-    hide NavigationRequest, NavigationDelegate;
-import 'package:webviewx/src/utils/navigation_request.dart';
-
-/// A copy from the original webview's navigation delegate typedef
-typedef NavigationDelegate = FutureOr<NavigationDecision> Function(
-    NavigationRequest navigation);
+import 'webview_flutter_original_utils.dart';
 
 /// Parameters specific to the mobile version.
 ///

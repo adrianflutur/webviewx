@@ -1,6 +1,1 @@
 include: package:pedantic/analysis_options.yaml
-
-analyzer:
-  errors:
-    # Let platform_view_registry_fix do it's job.
-    undefined_prefixed_name: ignore

@@ -3,30 +3,19 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
+import 'package:webviewx/src/utils/constants.dart';
 
 import 'dart:async';
 import 'dart:html' as html;
 import 'dart:js' as js;
-import 'dart:ui' as ui;
-import 'package:webview_flutter/platform_interface.dart';
-import 'package:webview_flutter/webview_flutter.dart'
-    hide WebView, WebViewController, NavigationRequest;
+import 'package:webviewx/src/utils/dart_ui_fix.dart' as ui;
 
-import 'package:webviewx/src/controller/web.dart'; //
-import 'package:webviewx/src/utils/constants.dart';
-import 'package:webviewx/src/utils/dart_callback.dart';
-import 'package:webviewx/src/utils/embedded_js_content.dart';
-import 'package:webviewx/src/utils/html_utils.dart';
-import 'package:webviewx/src/utils/mobile_specific_params.dart';
-import 'package:webviewx/src/utils/source_type.dart';
+import 'package:webviewx/src/controller/web.dart';
+import 'package:webviewx/src/utils/utils.dart';
 import 'package:webviewx/src/utils/view_content_model.dart';
 import 'package:webviewx/src/utils/web_history.dart';
-import 'package:webviewx/src/utils/web_specific_params.dart';
 
 import '../utils/x_frame_options_bypass.dart';
-
-// ignore: unused_import
-import 'package:webviewx/src/utils/platform_view_registry_fix.dart';
 
 /// Web implementation
 class WebViewXWidget extends StatefulWidget {
