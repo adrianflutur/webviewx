@@ -151,12 +151,11 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
       _callOnWebViewCreatedCallback();
     }
 
-    WidgetsBinding.instance.scheduleFrameCallback((_) {
-      _registerIframeOnLoadCallback();
-    });
+    _registerIframeOnLoadCallback();
+
     // Hack to allow the iframe to reach the "begin loading" state.
     // Otherwise it will fail loading the initial content.
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(Duration.zero, () {
       var newContentModel = webViewXController.value;
       _updateSource(newContentModel);
     });
@@ -242,18 +241,16 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
         // Hack to inject the connector function and js content inside the new source
         // Only when the source was set from inside itself (load function, on click)
 
-        // If you uncomment this, then you can also embed JS content inside the fetched
-        // URL, if it has SourceType.URL_BYPASS. But then the web wouldn't behave the same as
-        // the mobile version (you cannot do this on mobile).
+        // NOTE: MAY HAVE UNDESIRED BEHAVIOUR
 
-        // if (webViewXController.value.sourceType == SourceType.URL_BYPASS) {
-        //   iframe.srcdoc = HtmlUtils.preprocessSource(
-        //     iframe.srcdoc,
-        //     jsContent: widget.jsContent,
-        //     windowDisambiguator: iframeViewType,
-        //     forWeb: true,
-        //   );
-        // }
+        if (webViewXController.value.sourceType == SourceType.URL_BYPASS) {
+          iframe.srcdoc = HtmlUtils.preprocessSource(
+            iframe.srcdoc,
+            jsContent: widget.jsContent,
+            windowDisambiguator: iframeViewType,
+            forWeb: true,
+          );
+        }
 
         // This means it is the first time it loads
         if (widget.onPageStarted != null) {
