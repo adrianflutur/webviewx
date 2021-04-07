@@ -25,7 +25,7 @@ import 'package:meta/meta.dart';
 /// ...
 /// From Web:
 ///
-/// parent.Unique_Name_Here('test');
+/// Unique_Name_Here('test');
 ///
 /// From Mobile:
 ///

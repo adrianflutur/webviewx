@@ -16,6 +16,7 @@ enum JavascriptMode {
   unrestricted,
 }
 
+/// Describes the state of automatic media playback
 enum AutoMediaPlaybackPolicy {
   /// Starting any kind of media playback requires a user action.
   ///
