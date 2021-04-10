@@ -437,7 +437,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
             }
             var options = jsonEncode(headers);
             var optionsIndicator =
-                '[$BYPASS_URL_ADDITIONAL_OPTIONS_STARTING_POINT]';
+                '/[$BYPASS_URL_ADDITIONAL_OPTIONS_STARTING_POINT]';
             var url =
                 source + optionsIndicator + base64Encode(utf8.encode(options));
 

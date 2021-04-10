@@ -1,3 +1,9 @@
+## 0.0.4
+
+- It is now possible to add and execute JS inside webpages that were loaded using SourceType.URL_BYPASS
+- Fixed small issue when loading urls, where the proxies would fail fetching the page with error 400
+- Bumped dependencies version
+
 ## 0.0.3
 
 - Fixed more analyzer warnings
