@@ -9,28 +9,28 @@ import 'package:webview_flutter/webview_flutter.dart' as wf;
 /// Mobile implementation
 class WebViewXWidget extends StatefulWidget {
   /// Initial content
-  final String initialContent;
+  final String? initialContent;
 
   /// Initial source type. Must match [initialContent]'s type.
   ///
   /// Example:
   /// If you set [initialContent] to '<p>hi</p>', then you should
   /// also set the [initialSourceType] accordingly, that is [SourceType.HTML].
-  final SourceType initialSourceType;
+  final SourceType? initialSourceType;
 
   /// User-agent
   /// On web, this is only used when using [SourceType.URL_BYPASS]
-  final String userAgent;
+  final String? userAgent;
 
   /// Widget width
-  final double width;
+  final double? width;
 
   /// Widget height
-  final double height;
+  final double? height;
 
   /// Callback which returns a referrence to the [WebViewXController]
   /// being created.
-  final Function(WebViewXController controller) onWebViewCreated;
+  final Function(WebViewXController? controller)? onWebViewCreated;
 
   /// A set of [EmbeddedJsContent].
   ///
@@ -39,49 +39,49 @@ class WebViewXWidget extends StatefulWidget {
   /// using the controller.
   ///
   /// For more info, see [EmbeddedJsContent].
-  final Set<EmbeddedJsContent> jsContent;
+  final Set<EmbeddedJsContent>? jsContent;
 
   /// A set of [DartCallback].
   ///
   /// You can define Dart functions, which can be called from the JS side.
   ///
   /// For more info, see [DartCallback].
-  final Set<DartCallback> dartCallBacks;
+  final Set<DartCallback>? dartCallBacks;
 
   /// Boolean value to specify if should ignore all gestures that touch the webview.
   ///
   /// You can change this later from the controller.
-  final bool ignoreAllGestures;
+  final bool? ignoreAllGestures;
 
   /// Boolean value to specify if Javascript execution should be allowed inside the webview
-  final JavascriptMode javascriptMode;
+  final JavascriptMode? javascriptMode;
 
   /// This defines if media content(audio - video) should
   /// auto play when entering the page.
-  final AutoMediaPlaybackPolicy initialMediaPlaybackPolicy;
+  final AutoMediaPlaybackPolicy? initialMediaPlaybackPolicy;
 
   /// Callback for when the page starts loading.
-  final void Function(String src) onPageStarted;
+  final void Function(String src)? onPageStarted;
 
   /// Callback for when the page has finished loading (i.e. is shown on screen).
-  final void Function(String src) onPageFinished;
+  final void Function(String src)? onPageFinished;
 
   /// Callback for when something goes wrong in while page or resources load.
-  final void Function(WebResourceError error) onWebResourceError;
+  final void Function(WebResourceError error)? onWebResourceError;
 
   /// Parameters specific to the web version.
   /// This may eventually be merged with [mobileSpecificParams],
   /// if all features become cross platform.
-  final WebSpecificParams webSpecificParams;
+  final WebSpecificParams? webSpecificParams;
 
   /// Parameters specific to the web version.
   /// This may eventually be merged with [webSpecificParams],
   /// if all features become cross platform.
-  final MobileSpecificParams mobileSpecificParams;
+  final MobileSpecificParams? mobileSpecificParams;
 
   /// Constructor
   WebViewXWidget({
-    Key key,
+    Key? key,
     this.initialContent,
     this.initialSourceType,
     this.userAgent,
@@ -105,10 +105,10 @@ class WebViewXWidget extends StatefulWidget {
 }
 
 class _WebViewXWidgetState extends State<WebViewXWidget> {
-  wf.WebViewController originalWebViewController;
-  WebViewXController webViewXController;
+  wf.WebViewController? originalWebViewController;
+  WebViewXController? webViewXController;
 
-  bool _ignoreAllGestures;
+  bool? _ignoreAllGestures;
 
   @override
   void initState() {
@@ -129,7 +129,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
           value.toString() == widget.initialMediaPlaybackPolicy.toString(),
     );
     final onWebResourceError =
-        (wf_pi.WebResourceError err) => widget.onWebResourceError(
+        (wf_pi.WebResourceError err) => widget.onWebResourceError!(
               WebResourceError(
                 description: err.description,
                 errorCode: err.errorCode,
@@ -141,7 +141,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
               ),
             );
     final navigationDelegate = (wf.NavigationRequest request) async {
-      var delegate = await widget.mobileSpecificParams.navigationDelegate(
+      var delegate = await widget.mobileSpecificParams!.navigationDelegate!(
         NavigationRequest(
           content: request.url,
           isForMainFrame: request.isForMainFrame,
@@ -154,17 +154,17 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
     final onWebViewCreated = (wf.WebViewController webViewController) {
       originalWebViewController = webViewController;
 
-      webViewXController.connector = originalWebViewController;
+      webViewXController!.connector = originalWebViewController;
       // Calls onWebViewCreated to pass the refference upstream
       if (widget.onWebViewCreated != null) {
-        widget.onWebViewCreated(webViewXController);
+        widget.onWebViewCreated!(webViewXController);
       }
     };
-    final javascriptChannels = widget.dartCallBacks
+    final javascriptChannels = widget.dartCallBacks!
         .map(
           (cb) => wf.JavascriptChannel(
             name: cb.name,
-            onMessageReceived: (msg) => cb.callBack(msg.message),
+            onMessageReceived: (msg) => cb.callBack!(msg.message),
           ),
         )
         .toSet();
@@ -173,37 +173,37 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
       width: widget.width,
       height: widget.height,
       child: wf.WebView(
-        key: widget?.key,
+        key: widget.key,
         initialUrl: _initialContent(),
         javascriptMode: javascriptMode,
         onWebViewCreated: onWebViewCreated,
         javascriptChannels: javascriptChannels,
         gestureRecognizers:
-            widget.mobileSpecificParams.mobileGestureRecognizers,
+            widget.mobileSpecificParams!.mobileGestureRecognizers,
         onPageStarted: widget.onPageStarted,
         onPageFinished: widget.onPageFinished,
         initialMediaPlaybackPolicy: initialMediaPlaybackPolicy,
         onWebResourceError: onWebResourceError,
         gestureNavigationEnabled:
-            widget.mobileSpecificParams.gestureNavigationEnabled,
-        debuggingEnabled: widget.mobileSpecificParams.debuggingEnabled,
+            widget.mobileSpecificParams!.gestureNavigationEnabled,
+        debuggingEnabled: widget.mobileSpecificParams!.debuggingEnabled,
         navigationDelegate: navigationDelegate,
         userAgent: widget.userAgent,
       ),
     );
 
     return IgnorePointer(
-      ignoring: _ignoreAllGestures,
+      ignoring: _ignoreAllGestures!,
       child: webview,
     );
   }
 
   // Returns initial data
-  String _initialContent() {
+  String? _initialContent() {
     if (widget.initialSourceType == SourceType.HTML) {
       return HtmlUtils.preprocessSource(
-        widget.initialContent,
-        jsContent: widget.jsContent,
+        widget.initialContent!,
+        jsContent: widget.jsContent!,
         encodeHtml: true,
       );
     }
@@ -224,11 +224,11 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
   }
 
   // Prepares the source depending if it is HTML or URL
-  String _prepareContent(ViewContentModel model) {
+  String? _prepareContent(ViewContentModel model) {
     if (model.sourceType == SourceType.HTML) {
       return HtmlUtils.preprocessSource(
-        model.content,
-        jsContent: widget.jsContent,
+        model.content!,
+        jsContent: widget.jsContent!,
 
         // Needed for mobile webview in order to URI-encode the HTML
         encodeHtml: true,
@@ -239,25 +239,25 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
   // Called when WebViewXController updates it's value
   void _handleChange() {
-    var newContentModel = webViewXController.value;
+    final newContentModel = webViewXController!.value;
 
-    originalWebViewController.loadUrl(
-      _prepareContent(newContentModel),
-      headers: newContentModel.headers,
+    originalWebViewController!.loadUrl(
+      _prepareContent(newContentModel)!,
+      headers: newContentModel.headers as Map<String, String>?,
     );
   }
 
   // Called when the ValueNotifier inside WebViewXController updates it's value
   void _handleIgnoreGesturesChange() {
     setState(() {
-      _ignoreAllGestures = webViewXController.ignoringAllGestures;
+      _ignoreAllGestures = webViewXController!.ignoringAllGestures;
     });
   }
 
   @override
   void dispose() {
     webViewXController?.removeListener(_handleChange);
-    webViewXController?.ignoreAllGesturesNotifier?.removeListener(
+    webViewXController?.ignoreAllGesturesNotifier.removeListener(
       _handleIgnoreGesturesChange,
     );
     super.dispose();

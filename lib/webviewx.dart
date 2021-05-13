@@ -17,17 +17,17 @@ class WebViewX extends StatelessWidget {
 
   final SourceType initialSourceType;
 
-  final String userAgent;
+  final String? userAgent;
 
   /// Widget width
-  final double width;
+  final double? width;
 
   /// Widget height
-  final double height;
+  final double? height;
 
   /// Callback which returns a referrence to the [WebViewXController]
   /// being created.
-  final Function(WebViewXController controller) onWebViewCreated;
+  final Function(WebViewXController? controller)? onWebViewCreated;
 
   /// A set of [EmbeddedJsContent].
   ///
@@ -58,13 +58,13 @@ class WebViewX extends StatelessWidget {
   final AutoMediaPlaybackPolicy initialMediaPlaybackPolicy;
 
   /// Callback for when the page starts loading.
-  final void Function(String src) onPageStarted;
+  final void Function(String? src)? onPageStarted;
 
   /// Callback for when the page has finished loading (i.e. is shown on screen).
-  final void Function(String src) onPageFinished;
+  final void Function(String? src)? onPageFinished;
 
   /// Callback for when something goes wrong in while page or resources load.
-  final void Function(WebResourceError error) onWebResourceError;
+  final void Function(WebResourceError error)? onWebResourceError;
 
   /// Parameters specific to the web version.
   /// This may eventually be merged with [mobileSpecificParams],
@@ -78,7 +78,7 @@ class WebViewX extends StatelessWidget {
 
   /// Constructor
   WebViewX({
-    Key key,
+    Key? key,
     this.initialContent = 'about:blank',
     this.initialSourceType = SourceType.URL,
     this.userAgent,

@@ -59,15 +59,15 @@
 class EmbeddedJsContent {
   /// This param should be used when the JS you wish to define
   /// doesn't interact in any way with the Dart side
-  final String js;
+  final String? js;
 
   /// This (and webJs) param should be used when the JS you wish to define
   /// does interact with the Dart side
-  final String mobileJs;
+  final String? mobileJs;
 
   /// This (and mobileJs) param should be used when the JS you wish to define
   /// does interact with the Dart side
-  final String webJs;
+  final String? webJs;
 
   /// Constructor
   const EmbeddedJsContent({

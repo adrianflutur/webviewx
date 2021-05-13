@@ -1,7 +1,5 @@
 import 'dart:async';
 
-import 'package:meta/meta.dart';
-
 /// A copy from the original webview's navigation delegate typedef
 typedef NavigationDelegate = FutureOr<NavigationDecision> Function(
   NavigationRequest navigation,
@@ -45,7 +43,7 @@ enum NavigationDecision {
 /// This was needed because I couldn't extract the information I needed from inside the webview package.
 class NavigationRequest {
   /// Constructor
-  NavigationRequest({@required this.content, @required this.isForMainFrame});
+  NavigationRequest({required this.content, required this.isForMainFrame});
 
   /// The URL that will be loaded if the navigation is executed.
   final String content;
@@ -66,13 +64,12 @@ class WebResourceError {
   /// A user should not need to instantiate this class, but will receive one in
   /// [WebResourceErrorCallback].
   WebResourceError({
-    @required this.errorCode,
-    @required this.description,
+    required this.errorCode,
+    required this.description,
     this.domain,
     this.errorType,
     this.failingUrl,
-  })  : assert(errorCode != null),
-        assert(description != null);
+  });
 
   /// Raw code of the error from the respective platform.
   ///
@@ -94,7 +91,7 @@ class WebResourceError {
   /// in Objective-C. See
   /// https://developer.apple.com/library/archive/documentation/Cocoa/Conceptual/ErrorHandlingCocoa/ErrorObjectsDomains/ErrorObjectsDomains.html
   /// for more information on error handling on iOS.
-  final String domain;
+  final String? domain;
 
   /// Description of the error that can be used to communicate the problem to the user.
   final String description;
@@ -102,13 +99,13 @@ class WebResourceError {
   /// The type this error can be categorized as.
   ///
   /// This will never be `null` on Android, but can be `null` on iOS.
-  final WebResourceErrorType errorType;
+  final WebResourceErrorType? errorType;
 
   /// Gets the URL for which the resource request was made.
   ///
   /// This value is not provided on iOS. Alternatively, you can keep track of
   /// the last values provided to [WebViewPlatformController.loadUrl].
-  final String failingUrl;
+  final String? failingUrl;
 }
 
 /// Possible error type categorizations used by [WebResourceError].

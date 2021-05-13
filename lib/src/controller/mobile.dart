@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webviewx/src/utils/html_utils.dart';
 
-import 'dart:async' show Future;
+import 'dart:async' show Future, FutureOr;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:webviewx/src/utils/source_type.dart';
 import 'package:webviewx/src/utils/utils.dart';
@@ -11,16 +11,16 @@ import 'package:webviewx/src/utils/view_content_model.dart';
 /// Mobile implementation
 class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// Webview controller connector
-  WebViewController connector;
+  late WebViewController connector;
 
   /// Boolean value notifier used to toggle ignoring gestures on the webview
-  ValueNotifier<bool> ignoreAllGesturesNotifier;
+  ValueNotifier<bool?> ignoreAllGesturesNotifier;
 
   /// Constructor
   WebViewXController({
-    String initialContent,
-    SourceType initialSourceType,
-    bool ignoreAllGestures,
+    String? initialContent,
+    SourceType? initialSourceType,
+    bool? ignoreAllGestures,
   })  : ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
         super(
           ViewContentModel(
@@ -74,7 +74,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Boolean getter which reveals if the gestures are ignored right now
-  bool get ignoringAllGestures => ignoreAllGesturesNotifier.value;
+  bool? get ignoringAllGestures => ignoreAllGesturesNotifier.value;
 
   /// Function to set ignoring gestures
   void setIgnoreAllGestures(bool value) {
@@ -130,7 +130,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
 
   /// Returns the current content
   Future<WebViewContent> getContent() async {
-    var currentContent = await connector.currentUrl();
+    var currentContent = await (connector.currentUrl() as FutureOr<String>);
 
     //TODO clicking new urls should update (at least) the current sourcetype, and maybe the content
     var parsedContent = Uri.tryParse(currentContent);
@@ -162,8 +162,8 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Go forward in the history stack.
-  Future<bool> goForward() {
-    return connector.goForward();
+  Future<bool?> goForward() {
+    return connector.goForward().then((value) => value as bool?);
   }
 
   /// Reload the current content.
@@ -174,7 +174,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// Dispose resources
   @override
   void dispose() {
-    ignoreAllGesturesNotifier?.dispose();
+    ignoreAllGesturesNotifier.dispose();
     super.dispose();
   }
 }

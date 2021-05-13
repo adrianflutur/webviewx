@@ -8,12 +8,12 @@ import 'package:webviewx/src/utils/source_type.dart';
 /// This was needed because I couldn't retrieve accurate information
 /// about the current state of the URL from within the iframe.
 class HistoryStack {
-  HistoryEntry _currentEntry;
-  final Queue<HistoryEntry> _backHistory = Queue();
-  final Queue<HistoryEntry> _forwardHistory = Queue();
+  HistoryEntry? _currentEntry;
+  final Queue<HistoryEntry?> _backHistory = Queue();
+  final Queue<HistoryEntry?> _forwardHistory = Queue();
 
   /// Constructor
-  HistoryStack({HistoryEntry initialEntry}) : _currentEntry = initialEntry;
+  HistoryStack({HistoryEntry? initialEntry}) : _currentEntry = initialEntry;
 
   @override
   String toString() {
@@ -21,7 +21,7 @@ class HistoryStack {
   }
 
   /// Returns current history entry (i.e. current page)
-  HistoryEntry get currentEntry => _currentEntry;
+  HistoryEntry? get currentEntry => _currentEntry;
 
   /// Returns true if you can go back
   bool get canGoBack => _backHistory.isNotEmpty;
@@ -45,7 +45,7 @@ class HistoryStack {
 
   /// Function to move back in history.
   /// Returns the new history entry.
-  HistoryEntry moveBack() {
+  HistoryEntry? moveBack() {
     if (canGoBack) {
       _forwardHistory.addFirst(_currentEntry);
 
@@ -58,7 +58,7 @@ class HistoryStack {
 
   /// Function to move forward in history.
   /// Returns the new history entry.
-  HistoryEntry moveForward() {
+  HistoryEntry? moveForward() {
     if (canGoForward) {
       _backHistory.addLast(_currentEntry);
 
@@ -73,10 +73,10 @@ class HistoryStack {
 /// History entry
 class HistoryEntry {
   /// Source
-  final String source;
+  final String? source;
 
   /// Source type
-  final SourceType sourceType;
+  final SourceType? sourceType;
 
   /// Constructor
   HistoryEntry({

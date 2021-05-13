@@ -33,10 +33,10 @@ class MobileSpecificParams {
   ///   ),
   /// ),
   /// ```
-  final Set<Factory<OneSequenceGestureRecognizer>> mobileGestureRecognizers;
+  final Set<Factory<OneSequenceGestureRecognizer>>? mobileGestureRecognizers;
 
   /// Same as the original one from webview_flutter.
-  final NavigationDelegate navigationDelegate;
+  final NavigationDelegate? navigationDelegate;
 
   /// Same as the original one from webview_flutter.
   final bool debuggingEnabled;
