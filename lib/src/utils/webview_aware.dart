@@ -14,8 +14,8 @@ class WebViewAware extends StatelessWidget {
 
   /// Constructor
   WebViewAware({
-    Key key,
-    @required this.child,
+    Key? key,
+    required this.child,
     this.debug = false,
   }) : super(key: key);
 

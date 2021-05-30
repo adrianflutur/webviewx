@@ -14,13 +14,13 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   dynamic connector;
 
   /// Boolean value notifier used to toggle ignoring gestures on the webview
-  ValueNotifier<bool> ignoreAllGesturesNotifier;
+  ValueNotifier<bool?> ignoreAllGesturesNotifier;
 
   /// Constructor
   WebViewXController({
-    String initialContent,
-    SourceType initialSourceType,
-    bool ignoreAllGestures,
+    String? initialContent,
+    SourceType? initialSourceType,
+    bool? ignoreAllGestures,
   })  : ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
         super(
           ViewContentModel(

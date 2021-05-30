@@ -1,5 +1,3 @@
-import 'package:meta/meta.dart';
-
 /// Registers a Dart callback, which can be called from the Javascript side.
 /// This will be turned into a platform-specific dart callback, on runtime.
 ///
@@ -39,16 +37,13 @@ class DartCallback {
   final String name;
 
   /// Callback function
-  final Function(dynamic message) callBack;
+  final Function(dynamic message)? callBack;
 
   /// Constructor
   const DartCallback({
-    @required this.name,
+    required this.name,
     this.callBack,
-  }) : assert(
-          name != null,
-          'Javascript callback channel name must not be null.',
-        );
+  });
 
   @override
   bool operator ==(Object other) => other is DartCallback && other.name == name;
