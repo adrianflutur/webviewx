@@ -4,18 +4,18 @@ homepage: https://github.com/adrianflutur/webviewx
 version: 0.0.4
 
 environment:
-  sdk: '>=2.12.0 <3.0.0'
+  sdk: ">=2.12.0 <3.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
-  webview_flutter: ^2.0.4
-  pointer_interceptor: ^0.9.0
+  webview_flutter: ^2.0.8
+  pointer_interceptor: ^0.9.0+1
   pedantic: ^1.11.0
   uuid: ^3.0.4
-  meta: ^1.2.2
+  meta: ^1.3.0
   path: ^1.7.0
 
 dev_dependencies:
