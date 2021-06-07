@@ -154,7 +154,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
     final onWebViewCreated = (wf.WebViewController webViewController) {
       originalWebViewController = webViewController;
 
-      webViewXController!.connector = originalWebViewController;
+      webViewXController!.connector = originalWebViewController!;
       // Calls onWebViewCreated to pass the refference upstream
       if (widget.onWebViewCreated != null) {
         widget.onWebViewCreated!(webViewXController);
