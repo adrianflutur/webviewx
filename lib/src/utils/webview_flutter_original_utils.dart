@@ -43,7 +43,10 @@ enum NavigationDecision {
 /// This was needed because I couldn't extract the information I needed from inside the webview package.
 class NavigationRequest {
   /// Constructor
-  NavigationRequest({required this.content, required this.isForMainFrame});
+  NavigationRequest({
+    required this.content,
+    required this.isForMainFrame,
+  });
 
   /// The URL that will be loaded if the navigation is executed.
   final String content;

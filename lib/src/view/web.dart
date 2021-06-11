@@ -20,14 +20,14 @@ import '../utils/x_frame_options_bypass.dart';
 /// Web implementation
 class WebViewXWidget extends StatefulWidget {
   /// Initial content
-  final String? initialContent;
+  final String initialContent;
 
   /// Initial source type. Must match [initialContent]'s type.
   ///
   /// Example:
   /// If you set [initialContent] to '<p>hi</p>', then you should
   /// also set the [initialSourceType] accordingly, that is [SourceType.HTML].
-  final SourceType? initialSourceType;
+  final SourceType initialSourceType;
 
   /// User-agent
   /// On web, this is only used when using [SourceType.URL_BYPASS]
@@ -41,7 +41,7 @@ class WebViewXWidget extends StatefulWidget {
 
   /// Callback which returns a referrence to the [WebViewXController]
   /// being created.
-  final Function(WebViewXController? controller)? onWebViewCreated;
+  final Function(WebViewXController controller)? onWebViewCreated;
 
   /// A set of [EmbeddedJsContent].
   ///
@@ -50,32 +50,32 @@ class WebViewXWidget extends StatefulWidget {
   /// using the controller.
   ///
   /// For more info, see [EmbeddedJsContent].
-  final Set<EmbeddedJsContent>? jsContent;
+  final Set<EmbeddedJsContent> jsContent;
 
   /// A set of [DartCallback].
   ///
   /// You can define Dart functions, which can be called from the JS side.
   ///
   /// For more info, see [DartCallback].
-  final Set<DartCallback>? dartCallBacks;
+  final Set<DartCallback> dartCallBacks;
 
   /// Boolean value to specify if should ignore all gestures that touch the webview.
   ///
   /// You can change this later from the controller.
-  final bool? ignoreAllGestures;
+  final bool ignoreAllGestures;
 
   /// Boolean value to specify if Javascript execution should be allowed inside the webview
-  final JavascriptMode? javascriptMode;
+  final JavascriptMode javascriptMode;
 
   /// This defines if media content(audio - video) should
   /// auto play when entering the page.
-  final AutoMediaPlaybackPolicy? initialMediaPlaybackPolicy;
+  final AutoMediaPlaybackPolicy initialMediaPlaybackPolicy;
 
   /// Callback for when the page starts loading.
-  final void Function(String? src)? onPageStarted;
+  final void Function(String src)? onPageStarted;
 
   /// Callback for when the page has finished loading (i.e. is shown on screen).
-  final void Function(String? src)? onPageFinished;
+  final void Function(String src)? onPageFinished;
 
   /// Callback for when something goes wrong in while page or resources load.
   final void Function(WebResourceError error)? onWebResourceError;
@@ -83,32 +83,33 @@ class WebViewXWidget extends StatefulWidget {
   /// Parameters specific to the web version.
   /// This may eventually be merged with [mobileSpecificParams],
   /// if all features become cross platform.
-  final WebSpecificParams? webSpecificParams;
+  final WebSpecificParams webSpecificParams;
 
   /// Parameters specific to the web version.
   /// This may eventually be merged with [webSpecificParams],
   /// if all features become cross platform.
-  final MobileSpecificParams? mobileSpecificParams;
+  final MobileSpecificParams mobileSpecificParams;
 
   /// Constructor
   WebViewXWidget({
     Key? key,
-    this.initialContent,
-    this.initialSourceType,
+    this.initialContent = 'about:blank',
+    this.initialSourceType = SourceType.URL,
     this.userAgent,
     this.width,
     this.height,
     this.onWebViewCreated,
-    this.jsContent,
-    this.dartCallBacks,
-    this.ignoreAllGestures,
-    this.javascriptMode,
-    this.initialMediaPlaybackPolicy,
+    this.jsContent = const {},
+    this.dartCallBacks = const {},
+    this.ignoreAllGestures = false,
+    this.javascriptMode = JavascriptMode.unrestricted,
+    this.initialMediaPlaybackPolicy =
+        AutoMediaPlaybackPolicy.require_user_action_for_all_media_types,
     this.onPageStarted,
     this.onPageFinished,
     this.onWebResourceError,
-    this.webSpecificParams,
-    this.mobileSpecificParams,
+    this.webSpecificParams = const WebSpecificParams(),
+    this.mobileSpecificParams = const MobileSpecificParams(),
   }) : super(key: key);
 
   @override
@@ -116,17 +117,17 @@ class WebViewXWidget extends StatefulWidget {
 }
 
 class _WebViewXWidgetState extends State<WebViewXWidget> {
-  html.IFrameElement? iframe;
-  StreamSubscription? iframeOnLoadSubscription;
-  String? iframeViewType;
-  js.JsObject? jsWindowObject;
+  late html.IFrameElement iframe;
+  late String iframeViewType;
+  late StreamSubscription iframeOnLoadSubscription;
+  late js.JsObject jsWindowObject;
 
-  WebViewXController? webViewXController;
+  late WebViewXController webViewXController;
 
   // Pseudo state used to find out if the current iframe
   // has started or finished loading.
   late bool _pageLoadFinished;
-  bool? _ignoreAllGestures;
+  late bool _ignoreAllGestures;
 
   @override
   void initState() {
@@ -140,7 +141,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
     iframeViewType = _createViewType();
     iframe = _createIFrame();
 
-    _createWebViewXController();
+    webViewXController = _createWebViewXController();
 
     if (widget.initialSourceType == SourceType.HTML ||
         widget.initialSourceType == SourceType.URL_BYPASS ||
@@ -156,7 +157,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
     // Hack to allow the iframe to reach the "begin loading" state.
     // Otherwise it will fail loading the initial content.
     Future.delayed(Duration.zero, () {
-      final newContentModel = webViewXController!.value;
+      final newContentModel = webViewXController.value;
       _updateSource(newContentModel);
     });
   }
@@ -166,8 +167,8 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
     var script = html.ScriptElement()
       ..text = XFrameOptionsBypass.build(
-        cssloader: widget.webSpecificParams!.cssLoadingIndicator,
-        printDebugInfo: widget.webSpecificParams!.printDebugInfo,
+        cssloader: widget.webSpecificParams.cssLoadingIndicator,
+        printDebugInfo: widget.webSpecificParams.printDebugInfo,
       );
 
     if (!head.contains(script)) {
@@ -177,13 +178,13 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
     _printIfDebug('The XFrameBypass custom iframe element has loaded');
   }
 
-  void _createWebViewXController() {
-    webViewXController = WebViewXController(
+  WebViewXController _createWebViewXController() {
+    return WebViewXController(
       initialContent: widget.initialContent,
       initialSourceType: widget.initialSourceType,
       ignoreAllGestures: _ignoreAllGestures,
     )
-      ..printDebugInfo = widget.webSpecificParams!.printDebugInfo
+      ..printDebugInfo = widget.webSpecificParams.printDebugInfo
       ..addListener(_handleChange)
       ..ignoreAllGesturesNotifier.addListener(
         _handleIgnoreGesturesChange,
@@ -201,14 +202,14 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
       jsWindowObject = window;
 
       /// Register dart callbacks one by one.
-      for (var cb in widget.dartCallBacks!) {
-        jsWindowObject![cb.name] = cb.callBack;
+      for (var cb in widget.dartCallBacks) {
+        jsWindowObject[cb.name] = cb.callBack;
       }
 
       // Register history callback
-      jsWindowObject![WEB_HISTORY_CALLBACK] = (newHref) {
+      jsWindowObject[WEB_HISTORY_CALLBACK] = (newHref) {
         if (newHref != null) {
-          webViewXController!.webAddHistory(
+          webViewXController.webAddHistory(
             HistoryEntry(
               source: newHref,
               sourceType: SourceType.URL_BYPASS,
@@ -219,7 +220,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
         }
       };
 
-      webViewXController!.connector = jsWindowObject;
+      webViewXController.connector = jsWindowObject;
 
       if (then != null) {
         then();
@@ -228,13 +229,13 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
   }
 
   void _registerIframeOnLoadCallback() {
-    iframeOnLoadSubscription = iframe!.onLoad.listen((event) {
+    iframeOnLoadSubscription = iframe.onLoad.listen((event) {
       _printIfDebug('IFrame $iframeViewType has been (re)loaded.');
 
       if (_pageLoadFinished) {
         // This means it has loaded twice, so it has finished loading
         if (widget.onPageFinished != null) {
-          widget.onPageFinished!(iframe!.srcdoc);
+          widget.onPageFinished!(iframe.srcdoc!);
         }
         _pageLoadFinished = false;
       } else {
@@ -243,10 +244,11 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
         // NOTE: MAY HAVE UNDESIRED BEHAVIOUR
 
-        if (webViewXController!.value.sourceType == SourceType.URL_BYPASS) {
-          iframe!.srcdoc = HtmlUtils.preprocessSource(
-            iframe!.srcdoc!,
-            jsContent: widget.jsContent!,
+        if (webViewXController.value.sourceType == SourceType.URL_BYPASS) {
+          // ignore: unsafe_html
+          iframe.srcdoc = HtmlUtils.preprocessSource(
+            iframe.srcdoc!,
+            jsContent: widget.jsContent,
             windowDisambiguator: iframeViewType,
             forWeb: true,
           );
@@ -254,7 +256,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
         // This means it is the first time it loads
         if (widget.onPageStarted != null) {
-          widget.onPageStarted!(iframe!.srcdoc);
+          widget.onPageStarted!(iframe.srcdoc!);
         }
         _pageLoadFinished = true;
       }
@@ -276,12 +278,12 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
     Widget htmlElementView = SizedBox(
       width: widget.width,
       height: widget.height,
-      child: _htmlElement(iframeViewType!),
+      child: _htmlElement(iframeViewType),
     );
 
     return _iframeIgnorePointer(
       child: htmlElementView,
-      ignoring: _ignoreAllGestures!,
+      ignoring: _ignoreAllGestures,
     );
   }
 
@@ -302,7 +304,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
   void _registerView({required String? viewType}) {
     ui.platformViewRegistry.registerViewFactory(viewType!, (int viewId) {
-      return iframe!;
+      return iframe;
     });
   }
 
@@ -323,6 +325,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
   }
 
   html.IFrameElement _createIFrame() {
+    // ignore: unsafe_html
     var xFrameBypassElement = html.Element.html(
       '<iframe is="x-frame-bypass"></iframe>',
       validator: null,
@@ -335,19 +338,17 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
       ..style.border = 'none'
       ..width = widget.width!.toInt().toString()
       ..height = widget.height!.toInt().toString()
-      ..allowFullscreen = widget.webSpecificParams!.webAllowFullscreenContent;
+      ..allowFullscreen = widget.webSpecificParams.webAllowFullscreenContent;
 
-    widget.webSpecificParams!.additionalSandboxOptions
-        .forEach(iframeElement.sandbox!.add);
+    widget.webSpecificParams.additionalSandboxOptions.forEach(iframeElement.sandbox!.add);
 
     if (widget.javascriptMode == JavascriptMode.unrestricted) {
       iframeElement.sandbox!.add('allow-scripts');
     }
 
-    var allow = widget.webSpecificParams!.additionalAllowOptions;
+    var allow = widget.webSpecificParams.additionalAllowOptions;
 
-    if (widget.initialMediaPlaybackPolicy ==
-        AutoMediaPlaybackPolicy.always_allow) {
+    if (widget.initialMediaPlaybackPolicy == AutoMediaPlaybackPolicy.always_allow) {
       allow.add('autoplay');
     }
 
@@ -373,7 +374,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
   // add the connector to the controller (connector that
   // allows you to call JS methods)
   void _handleChange() {
-    final newContentModel = webViewXController!.value;
+    final newContentModel = webViewXController.value;
 
     switch (newContentModel.sourceType) {
       case SourceType.HTML:
@@ -399,7 +400,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
   void _handleIgnoreGesturesChange() {
     setState(() {
-      _ignoreAllGestures = webViewXController!.ignoringAllGestures;
+      _ignoreAllGestures = webViewXController.ignoringAllGestures;
     });
   }
 
@@ -407,16 +408,17 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
   void _updateSource(ViewContentModel newContentModel) {
     var source = newContentModel.content;
 
-    if (source == null || source.isEmpty) {
-      _printIfDebug('Error: Cannot set null or empty source on webview');
+    if (source.isEmpty) {
+      _printIfDebug('Error: Cannot set empty source on webview');
       return;
     }
 
     switch (newContentModel.sourceType) {
       case SourceType.HTML:
-        iframe!.srcdoc = HtmlUtils.preprocessSource(
+        // ignore: unsafe_html
+        iframe.srcdoc = HtmlUtils.preprocessSource(
           source,
-          jsContent: widget.jsContent!,
+          jsContent: widget.jsContent,
           windowDisambiguator: iframeViewType,
           forWeb: true,
         );
@@ -424,9 +426,10 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
       case SourceType.URL:
       case SourceType.URL_BYPASS:
         if (source == 'about:blank') {
-          iframe!.srcdoc = HtmlUtils.preprocessSource(
+          // ignore: unsafe_html
+          iframe.srcdoc = HtmlUtils.preprocessSource(
             '<br>',
-            jsContent: widget.jsContent!,
+            jsContent: widget.jsContent,
             windowDisambiguator: iframeViewType,
             forWeb: true,
           );
@@ -436,19 +439,19 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
           if (newContentModel.sourceType == SourceType.URL_BYPASS) {
             var headers = newContentModel.headers;
             if (widget.userAgent != null) {
-              headers[USER_AGENT_HEADERS_KEY] = widget.userAgent;
+              headers[USER_AGENT_HEADERS_KEY] = widget.userAgent!;
             }
             var options = jsonEncode(headers);
-            var optionsIndicator =
-                '/[$BYPASS_URL_ADDITIONAL_OPTIONS_STARTING_POINT]';
-            var url =
-                source + optionsIndicator + base64Encode(utf8.encode(options));
+            var optionsIndicator = '/[$BYPASS_URL_ADDITIONAL_OPTIONS_STARTING_POINT]';
+            var url = source + optionsIndicator + base64Encode(utf8.encode(options));
 
             //TODO Issue: On web, this only works the first time being used. When the user clicks a link,
             // theese options are lost.
-            iframe!.src = url;
+
+            // ignore: unsafe_html
+            iframe.src = url;
           } else {
-            iframe!.contentWindow!.location.href = source;
+            iframe.contentWindow!.location.href = source;
           }
         } else {
           _printIfDebug('Error: Invalid URL supplied for webview.');
@@ -460,16 +463,16 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
   }
 
   void _printIfDebug(String text) {
-    if (widget.webSpecificParams!.printDebugInfo) {
+    if (widget.webSpecificParams.printDebugInfo) {
       print(text);
     }
   }
 
   @override
   void dispose() {
-    iframeOnLoadSubscription?.cancel();
-    webViewXController?.removeListener(_handleChange);
-    webViewXController?.ignoreAllGesturesNotifier.removeListener(
+    iframeOnLoadSubscription.cancel();
+    webViewXController.removeListener(_handleChange);
+    webViewXController.ignoreAllGesturesNotifier.removeListener(
       _handleIgnoreGesturesChange,
     );
     super.dispose();

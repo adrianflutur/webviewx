@@ -14,14 +14,14 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   late WebViewController connector;
 
   /// Boolean value notifier used to toggle ignoring gestures on the webview
-  ValueNotifier<bool?> ignoreAllGesturesNotifier;
+  ValueNotifier<bool> ignoreAllGesturesNotifier;
 
   /// Constructor
   WebViewXController({
-    String? initialContent,
-    SourceType? initialSourceType,
-    bool? ignoreAllGestures,
-  })  : ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
+    required String initialContent,
+    required SourceType initialSourceType,
+    required bool ignoreAllGestures,
+  })   : ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
         super(
           ViewContentModel(
             content: initialContent,
@@ -42,8 +42,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// Returns true if the webview's current content is URL, and if
   /// [SourceType] is [SourceType.URL_BYPASS], which means it should
   /// use the bypass to fetch the web page content.
-  bool get isCurrentContentURLBypass =>
-      value.sourceType == SourceType.URL_BYPASS;
+  bool get isCurrentContentURLBypass => value.sourceType == SourceType.URL_BYPASS;
 
   /// Set webview content to the specified URL.
   /// Example URL: https://flutter.dev
@@ -74,7 +73,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Boolean getter which reveals if the gestures are ignored right now
-  bool? get ignoringAllGestures => ignoreAllGesturesNotifier.value;
+  bool get ignoringAllGestures => ignoreAllGesturesNotifier.value;
 
   /// Function to set ignoring gestures
   void setIgnoreAllGestures(bool value) {
@@ -162,8 +161,8 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Go forward in the history stack.
-  Future<bool?> goForward() {
-    return connector.goForward().then((value) => value as bool?);
+  Future<void> goForward() {
+    return connector.goForward();
   }
 
   /// Reload the current content.

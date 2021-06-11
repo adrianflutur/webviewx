@@ -37,13 +37,16 @@ void showSnackBar(String content, BuildContext context) {
 }
 
 Widget createButton({
-  VoidCallback onTap,
-  String text,
+  VoidCallback? onTap,
+  required String text,
 }) {
   return Container(
-    margin: const EdgeInsets.only(top: 10.0),
+    // margin: const EdgeInsets.only(top: 10.0),
     child: ElevatedButton(
       onPressed: onTap,
+      style: ElevatedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+      ),
       child: Text(text),
     ),
   );

@@ -8,14 +8,14 @@ import 'package:webviewx/src/utils/utils.dart';
 /// Trying to use this will throw UnimplementedError.
 class WebViewXWidget extends StatefulWidget {
   /// Initial content
-  final String? initialContent;
+  final String initialContent;
 
   /// Initial source type. Must match [initialContent]'s type.
   ///
   /// Example:
   /// If you set [initialContent] to '<p>hi</p>', then you should
   /// also set the [initialSourceType] accordingly, that is [SourceType.HTML].
-  final SourceType? initialSourceType;
+  final SourceType initialSourceType;
 
   /// User-agent
   /// On web, this is only used when using [SourceType.URL_BYPASS]
@@ -38,26 +38,26 @@ class WebViewXWidget extends StatefulWidget {
   /// using the controller.
   ///
   /// For more info, see [EmbeddedJsContent].
-  final Set<EmbeddedJsContent>? jsContent;
+  final Set<EmbeddedJsContent> jsContent;
 
   /// A set of [DartCallback].
   ///
   /// You can define Dart functions, which can be called from the JS side.
   ///
   /// For more info, see [DartCallback].
-  final Set<DartCallback>? dartCallBacks;
+  final Set<DartCallback> dartCallBacks;
 
   /// Boolean value to specify if should ignore all gestures that touch the webview.
   ///
   /// You can change this later from the controller.
-  final bool? ignoreAllGestures;
+  final bool ignoreAllGestures;
 
   /// Boolean value to specify if Javascript execution should be allowed inside the webview
-  final JavascriptMode? javascriptMode;
+  final JavascriptMode javascriptMode;
 
   /// This defines if media content(audio - video) should
   /// auto play when entering the page.
-  final AutoMediaPlaybackPolicy? initialMediaPlaybackPolicy;
+  final AutoMediaPlaybackPolicy initialMediaPlaybackPolicy;
 
   /// Callback for when the page starts loading.
   final void Function(String src)? onPageStarted;
@@ -71,32 +71,33 @@ class WebViewXWidget extends StatefulWidget {
   /// Parameters specific to the web version.
   /// This may eventually be merged with [mobileSpecificParams],
   /// if all features become cross platform.
-  final WebSpecificParams? webSpecificParams;
+  final WebSpecificParams webSpecificParams;
 
   /// Parameters specific to the web version.
   /// This may eventually be merged with [webSpecificParams],
   /// if all features become cross platform.
-  final MobileSpecificParams? mobileSpecificParams;
+  final MobileSpecificParams mobileSpecificParams;
 
   /// Constructor
   WebViewXWidget({
     Key? key,
-    this.initialContent,
-    this.initialSourceType,
+    this.initialContent = 'about:blank',
+    this.initialSourceType = SourceType.URL,
     this.userAgent,
     this.width,
     this.height,
     this.onWebViewCreated,
-    this.jsContent,
-    this.dartCallBacks,
-    this.ignoreAllGestures,
-    this.javascriptMode,
-    this.initialMediaPlaybackPolicy,
+    this.jsContent = const {},
+    this.dartCallBacks = const {},
+    this.ignoreAllGestures = false,
+    this.javascriptMode = JavascriptMode.unrestricted,
+    this.initialMediaPlaybackPolicy =
+        AutoMediaPlaybackPolicy.require_user_action_for_all_media_types,
     this.onPageStarted,
     this.onPageFinished,
     this.onWebResourceError,
-    this.webSpecificParams,
-    this.mobileSpecificParams,
+    this.webSpecificParams = const WebSpecificParams(),
+    this.mobileSpecificParams = const MobileSpecificParams(),
   }) : super(key: key);
 
   @override

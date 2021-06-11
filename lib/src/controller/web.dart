@@ -11,10 +11,10 @@ import 'package:webviewx/src/utils/web_history.dart';
 /// Web implementation
 class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// JsObject connector
-  js.JsObject? connector;
+  late js.JsObject connector;
 
   /// Boolean value notifier used to toggle ignoring gestures on the webview
-  ValueNotifier<bool?> ignoreAllGesturesNotifier;
+  ValueNotifier<bool> ignoreAllGesturesNotifier;
 
   // Stack-based custom history
   // First entry is the current url, last entry is the initial url
@@ -24,10 +24,10 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
 
   /// Constructor
   WebViewXController({
-    String? initialContent,
-    SourceType? initialSourceType,
-    bool? ignoreAllGestures,
-  })  : ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
+    required String initialContent,
+    required SourceType initialSourceType,
+    required bool ignoreAllGestures,
+  })   : ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
         _history = HistoryStack(
           initialEntry: HistoryEntry(
             source: initialContent,
@@ -54,8 +54,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// Returns true if the webview's current content is URL, and if
   /// [SourceType] is [SourceType.URL_BYPASS], which means it should
   /// use the bypass to fetch the web page content.
-  bool get isCurrentContentURLBypass =>
-      value.sourceType == SourceType.URL_BYPASS;
+  bool get isCurrentContentURLBypass => value.sourceType == SourceType.URL_BYPASS;
 
   /// Set webview content to the specified URL.
   /// Example URL: https://flutter.dev
@@ -88,7 +87,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Boolean getter which reveals if the gestures are ignored right now
-  bool? get ignoringAllGestures => ignoreAllGesturesNotifier.value;
+  bool get ignoringAllGestures => ignoreAllGesturesNotifier.value;
 
   /// Function to set ignoring gestures
   void setIgnoreAllGestures(bool value) {
@@ -114,7 +113,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
     String name,
     List<dynamic> params,
   ) {
-    var result = connector!.callMethod(name, params);
+    var result = connector.callMethod(name, params);
     return Future<dynamic>.value(result);
   }
 
@@ -129,7 +128,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
     String rawJavascript, {
     bool inGlobalContext = false,
   }) {
-    var result = (inGlobalContext ? js.context : connector)!.callMethod(
+    var result = (inGlobalContext ? js.context : connector).callMethod(
       'eval',
       [rawJavascript],
     );
@@ -167,8 +166,8 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Go back in the history stack.
-  void goBack() {
-    var entry = _history.moveBack()!;
+  Future<void> goBack() async {
+    var entry = _history.moveBack();
     _setContent(ViewContentModel(
       content: entry.source,
       sourceType: entry.sourceType,
@@ -183,8 +182,8 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Go forward in the history stack.
-  void goForward() {
-    var entry = _history.moveForward()!;
+  Future<void> goForward() async {
+    var entry = _history.moveForward();
     _setContent(ViewContentModel(
       content: entry.source,
       sourceType: entry.sourceType,
@@ -193,7 +192,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Reload the current content.
-  void reload() {
+  Future<void> reload() async {
     _setContent(ViewContentModel(
       content: _history.currentEntry!.source,
       sourceType: _history.currentEntry!.sourceType,

@@ -1,23 +1,31 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:webviewx/webviewx.dart';
 
 import 'helpers.dart';
 
 class WebViewXPage extends StatefulWidget {
-  WebViewXPage({Key key}) : super(key: key);
+  WebViewXPage({
+    Key? key,
+  }) : super(key: key);
 
   @override
   _WebViewXPageState createState() => _WebViewXPageState();
 }
 
 class _WebViewXPageState extends State<WebViewXPage> {
-  WebViewXController webviewController;
-  var initialContent =
+  late WebViewXController webviewController;
+  final initialContent =
       '<h4> This is some hardcoded HTML code embedded inside the webview <h4> <h2> Hello world! <h2>';
-  var executeJsErrorMessage =
+  final executeJsErrorMessage =
       'Failed to execute this task because the current content is (probably) URL that allows iframe embedding, on Web.\n\n'
       'A short reason for this is that, when a normal URL is embedded in the iframe, you do not actually own that content so you cant call your custom functions\n'
       '(read the documentation to find out why).';
+
+  Size get screenSize => MediaQuery.of(context).size;
+
+  bool get isMobile => screenSize.height >= screenSize.width * 2;
 
   void _setUrl() {
     webviewController.loadContent(
@@ -104,8 +112,7 @@ class _WebViewXPageState extends State<WebViewXPage> {
 
   void _callPlatformSpecificJsMethod() async {
     try {
-      await webviewController
-          .callJsMethod('testPlatformSpecificMethod', ['Hi']);
+      await webviewController.callJsMethod('testPlatformSpecificMethod', ['Hi']);
     } catch (e) {
       showAlertDialog(
         executeJsErrorMessage,
@@ -125,7 +132,7 @@ class _WebViewXPageState extends State<WebViewXPage> {
 
   @override
   void dispose() {
-    webviewController?.dispose();
+    webviewController.dispose();
     super.dispose();
   }
 
@@ -141,6 +148,7 @@ class _WebViewXPageState extends State<WebViewXPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
+              buildSpace(direction: Axis.vertical, amount: 20.0, flex: false),
               Container(
                 padding: const EdgeInsets.only(bottom: 20.0),
                 child: Text(
@@ -148,20 +156,23 @@ class _WebViewXPageState extends State<WebViewXPage> {
                   style: Theme.of(context).textTheme.headline6,
                 ),
               ),
+              buildSpace(direction: Axis.vertical, amount: 20.0, flex: false),
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black, width: 0.2),
                 ),
                 child: _buildWebViewX(),
               ),
-              const SizedBox(height: 20.0),
               Expanded(
                 child: Scrollbar(
                   isAlwaysShown: true,
                   child: SingleChildScrollView(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: _buildButtons(),
+                    child: SizedBox(
+                      width: min(screenSize.width * 0.8, 1024),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: _buildButtons(),
+                      ),
                     ),
                   ),
                 ),
@@ -198,56 +209,84 @@ class _WebViewXPageState extends State<WebViewXPage> {
           callBack: (msg) => showSnackBar(msg, context),
         )
       },
-      height: 300.0,
-      width: MediaQuery.of(context).size.width * 0.8,
+      height: screenSize.height / 2,
+      width: min(screenSize.width * 0.8, 1024),
     );
+  }
+
+  Widget buildSpace({
+    Axis direction = Axis.horizontal,
+    double amount = 0.2,
+    bool flex = true,
+  }) {
+    return flex
+        ? Flexible(
+            child: FractionallySizedBox(
+              widthFactor: direction == Axis.horizontal ? amount : null,
+              heightFactor: direction == Axis.vertical ? amount : null,
+            ),
+          )
+        : SizedBox(
+            width: direction == Axis.horizontal ? amount : null,
+            height: direction == Axis.vertical ? amount : null,
+          );
   }
 
   List<Widget> _buildButtons() {
     return [
-      Wrap(
-        spacing: 5.0,
+      buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          createButton(onTap: _goBack, text: 'Back'),
-          createButton(onTap: _goForward, text: 'Forward'),
-          createButton(onTap: _reload, text: 'Reload'),
+          Expanded(child: createButton(onTap: _goBack, text: 'Back')),
+          buildSpace(direction: Axis.horizontal),
+          Expanded(child: createButton(onTap: _goForward, text: 'Forward')),
+          buildSpace(direction: Axis.horizontal),
+          Expanded(child: createButton(onTap: _reload, text: 'Reload')),
         ],
       ),
+      buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
       createButton(
-        text:
-            'Change content to URL that allows iframes embedding (https://flutter.dev)',
+        text: 'Change content to URL that allows iframes embedding (https://flutter.dev)',
         onTap: _setUrl,
       ),
+      buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
       createButton(
         text:
             'Change content to URL that doesnt allow iframes embedding (https://news.ycombinator.com/)',
         onTap: _setUrlBypass,
       ),
+      buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
       createButton(
         text: 'Change content to HTML (hardcoded)',
         onTap: _setHtml,
       ),
+      buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
       createButton(
         text: 'Change content to HTML (from assets)',
         onTap: _setHtmlFromAssets,
       ),
+      buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
       createButton(
         text: 'Toggle on/off ignore any events (click, scroll etc)',
         onTap: _toggleIgnore,
       ),
+      buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
       createButton(
         text: 'Evaluate 2+2 in the global "window" (javascript side)',
         onTap: _evalRawJsInGlobalContext,
       ),
+      buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
       createButton(
         text: 'Call platform independent Js method (console.log)',
         onTap: _callPlatformIndependentJsMethod,
       ),
+      buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
       createButton(
-        text:
-            'Call platform specific Js method, that calls back a Dart function',
+        text: 'Call platform specific Js method, that calls back a Dart function',
         onTap: _callPlatformSpecificJsMethod,
       ),
+      buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
       createButton(
         text: 'Show current webview content',
         onTap: _getWebviewContent,
