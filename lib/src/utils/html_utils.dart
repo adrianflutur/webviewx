@@ -62,19 +62,19 @@ class HtmlUtils {
     }
 
     if (forWeb) {
-      _src = embedWebIframeJsConnector(_src, windowDisambiguator);
+      _src = embedWebIframeJsConnector(_src, windowDisambiguator!);
     }
 
     if (jsContent.isNotEmpty) {
-      var jsContentStrings = <String?>{};
+      var jsContentStrings = <String>{};
       for (var jsToEmbed in jsContent) {
         if (jsToEmbed.js != null) {
-          jsContentStrings.add(jsToEmbed.js);
+          jsContentStrings.add(jsToEmbed.js!);
         } else {
           if (forWeb && jsToEmbed.webJs != null) {
-            jsContentStrings.add(jsToEmbed.webJs);
+            jsContentStrings.add(jsToEmbed.webJs!);
           } else {
-            jsContentStrings.add(jsToEmbed.mobileJs);
+            jsContentStrings.add(jsToEmbed.mobileJs!);
           }
         }
       }
@@ -146,14 +146,14 @@ class HtmlUtils {
   /// This is just a helper function for the generic [embedInHtmlSource] function
   static String embedJsInHtmlSource(
     String source,
-    Set<String?> jsContents, {
+    Set<String> jsContents, {
     EmbedPosition position = EmbedPosition.ABOVE_BODY_CLOSE_TAG,
   }) {
     var newLine = '\n';
     var scriptOpenTag = '<script>';
     var scriptCloseTag = '</script>';
     var jsContent =
-        jsContents.reduce((prev, elem) => prev! + newLine * 2 + elem!)!;
+        jsContents.reduce((prev, elem) => prev + newLine * 2 + elem);
 
     var whatToEmbed = newLine +
         scriptOpenTag +
@@ -172,33 +172,33 @@ class HtmlUtils {
 
   /// Generic function to embed anything inside HTML source, at the specified position.
   static String embedInHtmlSource({
-    String? source,
-    String? whatToEmbed,
-    EmbedPosition? position,
+    required String source,
+    required String whatToEmbed,
+    required EmbedPosition position,
   }) {
     var indexToSplit;
 
     switch (position) {
       case EmbedPosition.BELOW_BODY_OPEN_TAG:
-        indexToSplit = source!.indexOf('<body>') + '<body>'.length;
+        indexToSplit = source.indexOf('<body>') + '<body>'.length;
         break;
       case EmbedPosition.ABOVE_BODY_CLOSE_TAG:
-        indexToSplit = source!.indexOf('</body>');
+        indexToSplit = source.indexOf('</body>');
         break;
       case EmbedPosition.BELOW_HEAD_OPEN_TAG:
-        indexToSplit = source!.indexOf('<head>') + '<head>'.length;
+        indexToSplit = source.indexOf('<head>') + '<head>'.length;
         break;
       case EmbedPosition.ABOVE_HEAD_CLOSE_TAG:
-        indexToSplit = source!.indexOf('</head>');
+        indexToSplit = source.indexOf('</head>');
         break;
       default:
         break;
     }
 
-    var splitSource1 = source!.substring(0, indexToSplit);
+    var splitSource1 = source.substring(0, indexToSplit);
     var splitSource2 = source.substring(indexToSplit);
 
-    return splitSource1 + whatToEmbed! + splitSource2;
+    return splitSource1 + whatToEmbed + splitSource2;
   }
 
   /// (WEB ONLY): Embeds a js-to-dart connector in the HTML source,
@@ -214,7 +214,7 @@ class HtmlUtils {
   /// will also call latter iframes' "connect_js_to_flutter" callbacks, thus messing up
   /// others' functions and, well, everything.
   static String embedWebIframeJsConnector(
-      String source, String? windowDisambiguator) {
+      String source, String windowDisambiguator) {
     return embedJsInHtmlSource(
       source,
       {

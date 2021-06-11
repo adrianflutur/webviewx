@@ -37,12 +37,12 @@ class DartCallback {
   final String name;
 
   /// Callback function
-  final Function(dynamic message)? callBack;
+  final Function(dynamic message) callBack;
 
   /// Constructor
   const DartCallback({
     required this.name,
-    this.callBack,
+    required this.callBack,
   });
 
   @override

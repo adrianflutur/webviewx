@@ -13,10 +13,13 @@ export 'src/utils/utils.dart';
 /// Basically it's a layout builder that makes sure the webview can still render
 /// even if you don't provide a width and/or a height.
 class WebViewX extends StatelessWidget {
+  /// Initial content
   final String initialContent;
 
+  /// Initial source type. Must match [initialContent]'s type.
   final SourceType initialSourceType;
 
+  /// User-agent
   final String? userAgent;
 
   /// Widget width
@@ -27,7 +30,7 @@ class WebViewX extends StatelessWidget {
 
   /// Callback which returns a referrence to the [WebViewXController]
   /// being created.
-  final Function(WebViewXController? controller)? onWebViewCreated;
+  final Function(WebViewXController controller)? onWebViewCreated;
 
   /// A set of [EmbeddedJsContent].
   ///
@@ -58,10 +61,10 @@ class WebViewX extends StatelessWidget {
   final AutoMediaPlaybackPolicy initialMediaPlaybackPolicy;
 
   /// Callback for when the page starts loading.
-  final void Function(String? src)? onPageStarted;
+  final void Function(String src)? onPageStarted;
 
   /// Callback for when the page has finished loading (i.e. is shown on screen).
-  final void Function(String? src)? onPageFinished;
+  final void Function(String src)? onPageFinished;
 
   /// Callback for when something goes wrong in while page or resources load.
   final void Function(WebResourceError error)? onWebResourceError;

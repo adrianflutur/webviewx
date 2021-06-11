@@ -5,15 +5,15 @@ import 'package:webviewx/src/utils/source_type.dart';
 /// This is the result of calling [await webViewXController.getContent()]
 class WebViewContent {
   /// The current source
-  final String? source;
+  final String source;
 
   /// The current source type
-  final SourceType? sourceType;
+  final SourceType sourceType;
 
   /// Constructor
   WebViewContent({
-    this.source,
-    this.sourceType,
+    required this.source,
+    required this.sourceType,
   });
 
   @override
