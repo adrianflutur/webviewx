@@ -1,8 +1,8 @@
 <p align="center">
-<img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/doc/images/webviewx_logo.png" height="400" alt="webviewx" />
+<img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/doc/images/webviewx_logo.png" height="450" alt="webviewx" />
 </p>
 
-[![pub package](https://shields.io/pub/v/webviewx.svg)](https://pub.dev/packages/webviewx)
+[![pub package](https://shields.io/pub/v/webviewx.svg?style=flat-square&color=blue)](https://pub.dev/packages/webviewx)
 
 A feature-rich cross-platform webview using [webview_flutter](https://pub.dev/packages/webview_flutter) for mobile and [iframe](https://api.flutter.dev/flutter/dart-html/IFrameElement-class.html) for web. JS interop-ready.
 
@@ -65,7 +65,7 @@ A feature-rich cross-platform webview using [webview_flutter](https://pub.dev/pa
 1. Create a `WebViewXController` inside your stateful widget
 
 ```dart
-WebViewXController webviewController;
+late WebViewXController webviewController;
 ```
 
 2. Add the WebViewX widget inside the build method, and set the `onWebViewCreated` callback in order to retrieve the controller when the webview is initialized
@@ -109,24 +109,24 @@ Note: For instructions on how to use theese features, please see each one's docu
 
 - ### Widget properties
 
-| Feature                                                    | Details                                                                                                                                             |
-| ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `String` initialContent                                    | Initial webview content                                                                                                                             |
-| `SourceType` initialSourceType                             | Initial webview content type (`URL, URL_BYPASS or HTML`)                                                                                            |
-| `String` userAgent                                         | User agent ( [issues on web](#known-issues-and-todos) )                                                                                             |
-| `double` width                                             | Widget's width (if null, it takes all available space)                                                                                              |
-| `double` height                                            | Widget's height (if null, it takes all available space)                                                                                             |
-| `Function(WebViewXController controller)` onWebViewCreated | Callback that gets executed when the webview has initialized                                                                                        |
-| `Set<EmbeddedJsContent>` jsContent                         | A set of EmbeddedJsContent, which is an object that defines some javascript which will be embedded in the page, once loaded (check the example app) |
-| `Set<DartCallback>` dartCallBacks                          | A set of DartCallback, which is an object that defines a dart callback function, which will be called from javascript (check the example app)       |
-| `bool` ignoreAllGestures                                   | Boolean value that specifies if the widget should ignore all gestures right after it is initialized                                                 |
-| `JavascriptMode` javascriptMode                            | This specifies if Javascript should be allowed to execute, or not (allowed by default, you must allow it in order to use above features)            |
-| `AutoMediaPlaybackPolicy` initialMediaPlaybackPolicy       | This specifies if media content should be allowed to autoplay when initialized (i.e when the page is loaded)                                        |
-| `void Function(String src)` onPageStarted                  | Callback that gets executed when a page starts loading (e.g. after you change the content)                                                          |
-| `void Function(String src)` onPageFinished                 | Callback that gets executed when a page finishes loading                                                                                            |
-| `void Function(WebResourceError error)` onWebResourceError | Callback that gets executed when there is an error when loading resources ( [issues on web](#known-issues-and-todos) )                              |
-| `WebSpecificParams` webSpecificParams                      | This is an object that contains web-specific options. Theese are not available on mobile (_yet_)                                                    |
-| `MobileSpecificParams` mobileSpecificParams                | This is an object that contains mobile-specific options. Theese are not available on web (_yet_)                                                    |
+| Feature                                                     | Details                                                                                                                                             |
+| ----------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `String` initialContent                                     | Initial webview content                                                                                                                             |
+| `SourceType` initialSourceType                              | Initial webview content type (`URL, URL_BYPASS or HTML`)                                                                                            |
+| `String?` userAgent                                         | User agent ( [issues on web](#known-issues-and-todos) )                                                                                             |
+| `double?` width                                             | Widget's width (if null, it takes all available space)                                                                                              |
+| `double?` height                                            | Widget's height (if null, it takes all available space)                                                                                             |
+| `Function(WebViewXController controller)?` onWebViewCreated | Callback that gets executed when the webview has initialized                                                                                        |
+| `Set<EmbeddedJsContent>` jsContent                          | A set of EmbeddedJsContent, which is an object that defines some javascript which will be embedded in the page, once loaded (check the example app) |
+| `Set<DartCallback>` dartCallBacks                           | A set of DartCallback, which is an object that defines a dart callback function, which will be called from javascript (check the example app)       |
+| `bool` ignoreAllGestures                                    | Boolean value that specifies if the widget should ignore all gestures right after it is initialized                                                 |
+| `JavascriptMode` javascriptMode                             | This specifies if Javascript should be allowed to execute, or not (allowed by default, you must allow it in order to use above features)            |
+| `AutoMediaPlaybackPolicy` initialMediaPlaybackPolicy        | This specifies if media content should be allowed to autoplay when initialized (i.e when the page is loaded)                                        |
+| `void Function(String src)?` onPageStarted                  | Callback that gets executed when a page starts loading (e.g. after you change the content)                                                          |
+| `void Function(String src)?` onPageFinished                 | Callback that gets executed when a page finishes loading                                                                                            |
+| `void Function(WebResourceError error)?` onWebResourceError | Callback that gets executed when there is an error when loading resources ( [issues on web](#known-issues-and-todos) )                              |
+| `WebSpecificParams` webSpecificParams                       | This is an object that contains web-specific options. Theese are not available on mobile (_yet_)                                                    |
+| `MobileSpecificParams` mobileSpecificParams                 | This is an object that contains mobile-specific options. Theese are not available on web (_yet_)                                                    |
 
 ---
 

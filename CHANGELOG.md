@@ -1,3 +1,10 @@
+## 0.1.0
+
+- Migrated to null safety
+- Fixed migration issues
+- Updated the example app
+- Bumped dependencies version
+
 ## 0.0.4
 
 - It is now possible to add and execute JS inside webpages that were loaded using SourceType.URL_BYPASS
