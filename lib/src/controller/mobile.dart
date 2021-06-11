@@ -129,10 +129,10 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
 
   /// Returns the current content
   Future<WebViewContent> getContent() async {
-    var currentContent = await (connector.currentUrl() as FutureOr<String>);
+    var currentContent = await connector.currentUrl();
 
     //TODO clicking new urls should update (at least) the current sourcetype, and maybe the content
-    var parsedContent = Uri.tryParse(currentContent);
+    var parsedContent = Uri.tryParse(currentContent!);
     if (parsedContent != null && parsedContent.data != null) {
       currentContent = Uri.decodeFull(currentContent);
     }
