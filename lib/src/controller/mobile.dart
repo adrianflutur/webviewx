@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webviewx/src/utils/html_utils.dart';
 
-import 'dart:async' show Future, FutureOr;
+import 'dart:async' show Future;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:webviewx/src/utils/source_type.dart';
 import 'package:webviewx/src/utils/utils.dart';
@@ -42,8 +42,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// Returns true if the webview's current content is URL, and if
   /// [SourceType] is [SourceType.URL_BYPASS], which means it should
   /// use the bypass to fetch the web page content.
-  bool get isCurrentContentURLBypass =>
-      value.sourceType == SourceType.URL_BYPASS;
+  bool get isCurrentContentURLBypass => value.sourceType == SourceType.URL_BYPASS;
 
   /// Set webview content to the specified URL.
   /// Example URL: https://flutter.dev
@@ -51,14 +50,14 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// If [fromAssets] param is set to true,
   /// [url] param must be a String path to an asset
   /// Example: 'assets/some_url.txt'
-  void loadContent(
+  Future<void> loadContent(
     String content,
     SourceType sourceType, {
     Map<String, String> headers = const {},
     bool fromAssets = false,
   }) async {
     if (fromAssets) {
-      var _content = await rootBundle.loadString(content);
+      final _content = await rootBundle.loadString(content);
       _setContent(ViewContentModel(
         content: _content,
         headers: headers,

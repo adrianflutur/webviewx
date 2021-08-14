@@ -124,25 +124,26 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
     final javascriptMode = wf.JavascriptMode.values.singleWhere(
       (value) => value.toString() == widget.javascriptMode.toString(),
     );
-    final initialMediaPlaybackPolicy =
-        wf.AutoMediaPlaybackPolicy.values.singleWhere(
-      (value) =>
-          value.toString() == widget.initialMediaPlaybackPolicy.toString(),
+    final initialMediaPlaybackPolicy = wf.AutoMediaPlaybackPolicy.values.singleWhere(
+      (value) => value.toString() == widget.initialMediaPlaybackPolicy.toString(),
     );
-    final onWebResourceError =
-        (wf_pi.WebResourceError err) => widget.onWebResourceError!(
-              WebResourceError(
-                description: err.description,
-                errorCode: err.errorCode,
-                domain: err.domain,
-                errorType: WebResourceErrorType.values.singleWhere(
-                  (value) => value.toString() == err.errorType.toString(),
-                ),
-                failingUrl: err.failingUrl,
-              ),
-            );
+    final onWebResourceError = (wf_pi.WebResourceError err) => widget.onWebResourceError!(
+          WebResourceError(
+            description: err.description,
+            errorCode: err.errorCode,
+            domain: err.domain,
+            errorType: WebResourceErrorType.values.singleWhere(
+              (value) => value.toString() == err.errorType.toString(),
+            ),
+            failingUrl: err.failingUrl,
+          ),
+        );
     final navigationDelegate = (wf.NavigationRequest request) async {
-      var delegate = await widget.mobileSpecificParams.navigationDelegate!(
+      if (widget.mobileSpecificParams.navigationDelegate == null) {
+        return wf.NavigationDecision.navigate;
+      }
+
+      var delegate = await widget.mobileSpecificParams.navigationDelegate!.call(
         NavigationRequest(
           content: request.url,
           isForMainFrame: request.isForMainFrame,
@@ -179,14 +180,12 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
         javascriptMode: javascriptMode,
         onWebViewCreated: onWebViewCreated,
         javascriptChannels: javascriptChannels,
-        gestureRecognizers:
-            widget.mobileSpecificParams.mobileGestureRecognizers,
+        gestureRecognizers: widget.mobileSpecificParams.mobileGestureRecognizers,
         onPageStarted: widget.onPageStarted,
         onPageFinished: widget.onPageFinished,
         initialMediaPlaybackPolicy: initialMediaPlaybackPolicy,
         onWebResourceError: onWebResourceError,
-        gestureNavigationEnabled:
-            widget.mobileSpecificParams.gestureNavigationEnabled,
+        gestureNavigationEnabled: widget.mobileSpecificParams.gestureNavigationEnabled,
         debuggingEnabled: widget.mobileSpecificParams.debuggingEnabled,
         navigationDelegate: navigationDelegate,
         userAgent: widget.userAgent,

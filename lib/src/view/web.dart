@@ -124,17 +124,15 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
   late WebViewXController webViewXController;
 
-  // Pseudo state used to find out if the current iframe
-  // has started or finished loading.
-  late bool _pageLoadFinished;
+  // Pseudo state used to find out if the initial content has loaded
+  late bool _initialContentLoaded;
   late bool _ignoreAllGestures;
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize to true, because it will start loading once it is created
-    _pageLoadFinished = true;
+    _initialContentLoaded = false;
     _ignoreAllGestures = widget.ignoreAllGestures;
 
     iframeViewType = _createViewType();
@@ -210,20 +208,29 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
     iframeOnLoadSubscription = iframe.onLoad.listen((event) {
       _printIfDebug('IFrame $iframeViewType has been (re)loaded.');
 
-      if (_pageLoadFinished) {
-        // This means it has loaded twice, so it has finished loading
-        widget.onPageFinished?.call(webViewXController.value.content);
-        _pageLoadFinished = false;
+      //TODO
+      // webViewXController.value.content is the un-synchronized value
+      // replace it with the current value from the current history entry
+      // (probably will just give up ValueNotifier or turn it into a ChangeNotifier)
+      if (!_initialContentLoaded) {
+        _initialContentLoaded = true;
+        _callOnPageStartedCallback(webViewXController.value.content);
       } else {
-        // This means it is the first time it loads
-        widget.onPageStarted?.call(webViewXController.value.content);
-        _pageLoadFinished = true;
+        _callOnPageFinishedCallback(webViewXController.value.content);
       }
     });
   }
 
   void _callOnWebViewCreatedCallback() {
     widget.onWebViewCreated?.call(webViewXController);
+  }
+
+  void _callOnPageStartedCallback(String src) {
+    widget.onPageStarted?.call(src);
+  }
+
+  void _callOnPageFinishedCallback(String src) {
+    widget.onPageFinished?.call(src);
   }
 
   @override
@@ -240,7 +247,10 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
     );
   }
 
-  Widget _iframeIgnorePointer({required Widget child, bool ignoring = false}) {
+  Widget _iframeIgnorePointer({
+    required Widget child,
+    bool ignoring = false,
+  }) {
     return Stack(
       children: [
         child,
@@ -306,22 +316,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
   void _handleChange() {
     final newContentModel = webViewXController.value;
 
-    switch (newContentModel.sourceType) {
-      case SourceType.HTML:
-        _connectJsToFlutter();
-        _pageLoadFinished = true;
-        break;
-      case SourceType.URL:
-        _pageLoadFinished = true;
-        if (newContentModel.content == 'about:blank') {
-          _connectJsToFlutter();
-        }
-        break;
-      case SourceType.URL_BYPASS:
-        _connectJsToFlutter();
-        break;
-    }
-
+    _callOnPageStartedCallback(newContentModel.content);
     _updateSource(newContentModel);
   }
 
@@ -333,7 +328,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
   // Updates the source depending if it is HTML or URL
   void _updateSource(ViewContentModel newContentModel) {
-    var content = newContentModel.content;
+    final content = newContentModel.content;
 
     if (content.isEmpty) {
       _printIfDebug('Error: Cannot set empty source on webview');
@@ -534,7 +529,6 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
       windowDisambiguator: iframeViewType,
       forWeb: true,
     );
-    _pageLoadFinished = true;
   }
 
   void _printIfDebug(String text) {

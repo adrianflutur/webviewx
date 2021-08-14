@@ -186,7 +186,7 @@ class _WebViewXPageState extends State<WebViewXPage> {
       initialSourceType: SourceType.HTML,
       onWebViewCreated: (controller) => webviewController = controller,
       onPageStarted: (src) => print('A new page has started loading: $src\n'),
-      onPageFinished: (src) => print('The page has finished loading. $src\n'),
+      onPageFinished: (src) => print('The page has finished loading: $src\n'),
       jsContent: {
         EmbeddedJsContent(
           js: "function testPlatformIndependentMethod() { console.log('Hi from JS') }",
@@ -204,7 +204,7 @@ class _WebViewXPageState extends State<WebViewXPage> {
           callBack: (msg) => showSnackBar(msg, context),
         )
       },
-      webSpecificParams: WebSpecificParams(printDebugInfo: false),
+      webSpecificParams: WebSpecificParams(printDebugInfo: true),
       height: screenSize.height / 2,
       width: min(screenSize.width * 0.8, 1024),
     );

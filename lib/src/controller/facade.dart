@@ -46,12 +46,12 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// If [fromAssets] param is set to true,
   /// [url] param must be a String path to an asset
   /// Example: 'assets/some_url.txt'
-  void loadContent(
+  Future<void> loadContent(
     String content,
     SourceType sourceType, {
     Map<String, String> headers = const {},
     bool fromAssets = false,
-  }) async =>
+  }) =>
       throw UnimplementedError();
 
   /// Boolean getter which reveals if the gestures are ignored right now
