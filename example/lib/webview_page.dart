@@ -25,8 +25,6 @@ class _WebViewXPageState extends State<WebViewXPage> {
 
   Size get screenSize => MediaQuery.of(context).size;
 
-  bool get isMobile => screenSize.height >= screenSize.width * 2;
-
   void _setUrl() {
     webviewController.loadContent(
       'https://flutter.dev',
@@ -112,8 +110,7 @@ class _WebViewXPageState extends State<WebViewXPage> {
 
   void _callPlatformSpecificJsMethod() async {
     try {
-      await webviewController
-          .callJsMethod('testPlatformSpecificMethod', ['Hi']);
+      await webviewController.callJsMethod('testPlatformSpecificMethod', ['Hi']);
     } catch (e) {
       showAlertDialog(
         executeJsErrorMessage,
@@ -149,15 +146,15 @@ class _WebViewXPageState extends State<WebViewXPage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
-              buildSpace(direction: Axis.vertical, amount: 20.0, flex: false),
+              buildSpace(direction: Axis.vertical, amount: 10.0, flex: false),
               Container(
                 padding: const EdgeInsets.only(bottom: 20.0),
                 child: Text(
-                  'Play around with the buttons to see how does it work',
+                  'Play around with the buttons below',
                   style: Theme.of(context).textTheme.headline6,
                 ),
               ),
-              buildSpace(direction: Axis.vertical, amount: 20.0, flex: false),
+              buildSpace(direction: Axis.vertical, amount: 10.0, flex: false),
               Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.black, width: 0.2),
@@ -167,13 +164,10 @@ class _WebViewXPageState extends State<WebViewXPage> {
               Expanded(
                 child: Scrollbar(
                   isAlwaysShown: true,
-                  child: SingleChildScrollView(
-                    child: SizedBox(
-                      width: min(screenSize.width * 0.8, 1024),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: _buildButtons(),
-                      ),
+                  child: SizedBox(
+                    width: min(screenSize.width * 0.8, 512),
+                    child: ListView(
+                      children: _buildButtons(),
                     ),
                   ),
                 ),
@@ -191,8 +185,8 @@ class _WebViewXPageState extends State<WebViewXPage> {
       initialContent: initialContent,
       initialSourceType: SourceType.HTML,
       onWebViewCreated: (controller) => webviewController = controller,
-      onPageStarted: (url) => print('A new page has started loading...\n'),
-      onPageFinished: (url) => print('The page has finished loading.\n'),
+      onPageStarted: (src) => print('A new page has started loading: $src\n'),
+      onPageFinished: (src) => print('The page has finished loading. $src\n'),
       jsContent: {
         EmbeddedJsContent(
           js: "function testPlatformIndependentMethod() { console.log('Hi from JS') }",
@@ -210,6 +204,7 @@ class _WebViewXPageState extends State<WebViewXPage> {
           callBack: (msg) => showSnackBar(msg, context),
         )
       },
+      webSpecificParams: WebSpecificParams(printDebugInfo: false),
       height: screenSize.height / 2,
       width: min(screenSize.width * 0.8, 1024),
     );
@@ -237,25 +232,25 @@ class _WebViewXPageState extends State<WebViewXPage> {
     return [
       buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
       Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(child: createButton(onTap: _goBack, text: 'Back')),
-          buildSpace(direction: Axis.horizontal),
+          buildSpace(direction: Axis.horizontal, amount: 12, flex: false),
           Expanded(child: createButton(onTap: _goForward, text: 'Forward')),
-          buildSpace(direction: Axis.horizontal),
+          buildSpace(direction: Axis.horizontal, amount: 12, flex: false),
           Expanded(child: createButton(onTap: _reload, text: 'Reload')),
         ],
       ),
       buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
       createButton(
         text:
-            'Change content to URL that allows iframes embedding (https://flutter.dev)',
+            'Change content to URL that allows iframes embedding\n(https://flutter.dev)',
         onTap: _setUrl,
       ),
       buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
       createButton(
         text:
-            'Change content to URL that doesnt allow iframes embedding (https://news.ycombinator.com/)',
+            'Change content to URL that doesnt allow iframes embedding\n(https://news.ycombinator.com/)',
         onTap: _setUrlBypass,
       ),
       buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
@@ -285,8 +280,7 @@ class _WebViewXPageState extends State<WebViewXPage> {
       ),
       buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
       createButton(
-        text:
-            'Call platform specific Js method, that calls back a Dart function',
+        text: 'Call platform specific Js method, that calls back a Dart function',
         onTap: _callPlatformSpecificJsMethod,
       ),
       buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),

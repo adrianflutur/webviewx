@@ -105,8 +105,7 @@ class HtmlUtils {
   /// Encodes an image (as a list of bytes) to a base64 embedded HTML image
   ///
   /// Pretty raw, I know, but it works
-  static String encodeImageAsEmbeddedBase64(
-      String fileName, Uint8List imageBytes) {
+  static String encodeImageAsEmbeddedBase64(String fileName, Uint8List imageBytes) {
     var imageWidth = '100%';
     var base64Image = '<img width=\"$imageWidth\" src=\"data:image/png;base64, '
         '${base64Encode(imageBytes)}\" data-filename=\"$fileName\">';
@@ -152,8 +151,7 @@ class HtmlUtils {
     var newLine = '\n';
     var scriptOpenTag = '<script>';
     var scriptCloseTag = '</script>';
-    var jsContent =
-        jsContents.reduce((prev, elem) => prev + newLine * 2 + elem);
+    var jsContent = jsContents.reduce((prev, elem) => prev + newLine * 2 + elem);
 
     var whatToEmbed = newLine +
         scriptOpenTag +
@@ -170,35 +168,43 @@ class HtmlUtils {
     );
   }
 
+  /// Inject `toInject` as a child of the specified `htmlTag`.
+  /// The `htmlTag` can be, for example, `head` or `body`.
+  ///
+  /// The way it works is that it will take the whole `htmlTag`, including
+  /// it's attributes (if any), and it will append `toInject` to it, such as the original
+  /// `htmlTag` will now have `toInject` as it's first child (by child we mean HTML DOM child)
+  static String injectAsChildOf(String htmlTag, String source, String toInject) {
+    final replaceSpot = '<$htmlTag([^>]*)>';
+    return source.replaceFirstMapped(RegExp(replaceSpot, caseSensitive: false), (match) {
+      return '<$htmlTag${match.group(1)!}> \n$toInject';
+    });
+  }
+
   /// Generic function to embed anything inside HTML source, at the specified position.
   static String embedInHtmlSource({
     required String source,
     required String whatToEmbed,
     required EmbedPosition position,
   }) {
-    var indexToSplit;
-
     switch (position) {
-      case EmbedPosition.BELOW_BODY_OPEN_TAG:
-        indexToSplit = source.indexOf('<body>') + '<body>'.length;
-        break;
-      case EmbedPosition.ABOVE_BODY_CLOSE_TAG:
-        indexToSplit = source.indexOf('</body>');
-        break;
       case EmbedPosition.BELOW_HEAD_OPEN_TAG:
-        indexToSplit = source.indexOf('<head>') + '<head>'.length;
-        break;
+        return injectAsChildOf('head', source, whatToEmbed);
+      case EmbedPosition.BELOW_BODY_OPEN_TAG:
+        return injectAsChildOf('body', source, whatToEmbed);
       case EmbedPosition.ABOVE_HEAD_CLOSE_TAG:
-        indexToSplit = source.indexOf('</head>');
-        break;
-      default:
-        break;
+        final indexToSplit = source.indexOf('</head>');
+        final splitSource1 = source.substring(0, indexToSplit);
+        final splitSource2 = source.substring(indexToSplit);
+
+        return splitSource1 + whatToEmbed + '\n' + splitSource2;
+      case EmbedPosition.ABOVE_BODY_CLOSE_TAG:
+        final indexToSplit = source.indexOf('</body>');
+        final splitSource1 = source.substring(0, indexToSplit);
+        final splitSource2 = source.substring(indexToSplit);
+
+        return splitSource1 + whatToEmbed + '\n' + splitSource2;
     }
-
-    var splitSource1 = source.substring(0, indexToSplit);
-    var splitSource2 = source.substring(indexToSplit);
-
-    return splitSource1 + whatToEmbed + splitSource2;
   }
 
   /// (WEB ONLY): Embeds a js-to-dart connector in the HTML source,
@@ -213,8 +219,7 @@ class HtmlUtils {
   /// the last one of them. This is because the last one that renders on the screen
   /// will also call latter iframes' "connect_js_to_flutter" callbacks, thus messing up
   /// others' functions and, well, everything.
-  static String embedWebIframeJsConnector(
-      String source, String windowDisambiguator) {
+  static String embedWebIframeJsConnector(String source, String windowDisambiguator) {
     return embedJsInHtmlSource(
       source,
       {

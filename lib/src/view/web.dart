@@ -15,7 +15,7 @@ import 'package:webviewx/src/utils/utils.dart';
 import 'package:webviewx/src/utils/view_content_model.dart';
 import 'package:webviewx/src/utils/web_history.dart';
 
-import '../utils/x_frame_options_bypass.dart';
+import 'package:http/http.dart' as http;
 
 /// Web implementation
 class WebViewXWidget extends StatefulWidget {
@@ -132,7 +132,6 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
   @override
   void initState() {
     super.initState();
-    _addXFrameElement();
 
     // Initialize to true, because it will start loading once it is created
     _pageLoadFinished = true;
@@ -140,6 +139,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
     iframeViewType = _createViewType();
     iframe = _createIFrame();
+    _registerView(viewType: iframeViewType);
 
     webViewXController = _createWebViewXController();
 
@@ -154,28 +154,17 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
     _registerIframeOnLoadCallback();
 
-    // Hack to allow the iframe to reach the "begin loading" state.
+    // Allow the iframe to initialize.
     // Otherwise it will fail loading the initial content.
     Future.delayed(Duration.zero, () {
-      final newContentModel = webViewXController.value;
-      _updateSource(newContentModel);
+      _updateSource(webViewXController.value);
     });
   }
 
-  void _addXFrameElement() {
-    var head = html.document.head!;
-
-    var script = html.ScriptElement()
-      ..text = XFrameOptionsBypass.build(
-        cssloader: widget.webSpecificParams.cssLoadingIndicator,
-        printDebugInfo: widget.webSpecificParams.printDebugInfo,
-      );
-
-    if (!head.contains(script)) {
-      head.append(script);
-    }
-
-    _printIfDebug('The XFrameBypass custom iframe element has loaded');
+  void _registerView({required String? viewType}) {
+    ui.platformViewRegistry.registerViewFactory(viewType!, (int viewId) {
+      return iframe;
+    });
   }
 
   WebViewXController _createWebViewXController() {
@@ -207,24 +196,13 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
       }
 
       // Register history callback
-      jsWindowObject[WEB_HISTORY_CALLBACK] = (newHref) {
-        if (newHref != null) {
-          webViewXController.webAddHistory(
-            HistoryEntry(
-              source: newHref,
-              sourceType: SourceType.URL_BYPASS,
-            ),
-          );
-
-          _printIfDebug('Got a new history entry');
-        }
+      jsWindowObject[WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK] = (onClickCallbackObject) {
+        _handleOnIframeClick(onClickCallbackObject);
       };
 
       webViewXController.connector = jsWindowObject;
 
-      if (then != null) {
-        then();
-      }
+      then?.call();
     };
   }
 
@@ -234,47 +212,22 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
       if (_pageLoadFinished) {
         // This means it has loaded twice, so it has finished loading
-        if (widget.onPageFinished != null) {
-          widget.onPageFinished!(iframe.srcdoc!);
-        }
+        widget.onPageFinished?.call(webViewXController.value.content);
         _pageLoadFinished = false;
       } else {
-        // Hack to inject the connector function and js content inside the new source
-        // Only when the source was set from inside itself (load function, on click)
-
-        // NOTE: MAY HAVE UNDESIRED BEHAVIOUR
-
-        if (webViewXController.value.sourceType == SourceType.URL_BYPASS) {
-          // ignore: unsafe_html
-          iframe.srcdoc = HtmlUtils.preprocessSource(
-            iframe.srcdoc!,
-            jsContent: widget.jsContent,
-            windowDisambiguator: iframeViewType,
-            forWeb: true,
-          );
-        }
-
         // This means it is the first time it loads
-        if (widget.onPageStarted != null) {
-          widget.onPageStarted!(iframe.srcdoc!);
-        }
+        widget.onPageStarted?.call(webViewXController.value.content);
         _pageLoadFinished = true;
       }
     });
   }
 
   void _callOnWebViewCreatedCallback() {
-    if (widget.onWebViewCreated != null) {
-      widget.onWebViewCreated!(webViewXController);
-    }
+    widget.onWebViewCreated?.call(webViewXController);
   }
 
   @override
   Widget build(BuildContext context) {
-    _registerView(
-      viewType: iframeViewType,
-    );
-
     Widget htmlElementView = SizedBox(
       width: widget.width,
       height: widget.height,
@@ -302,12 +255,6 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
     );
   }
 
-  void _registerView({required String? viewType}) {
-    ui.platformViewRegistry.registerViewFactory(viewType!, (int viewId) {
-      return iframe;
-    });
-  }
-
   Widget _htmlElement(String iframeViewType) {
     return AbsorbPointer(
       child: RepaintBoundary(
@@ -325,14 +272,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
   }
 
   html.IFrameElement _createIFrame() {
-    // ignore: unsafe_html
-    var xFrameBypassElement = html.Element.html(
-      '<iframe is="x-frame-bypass"></iframe>',
-      validator: null,
-      treeSanitizer: html.NodeTreeSanitizer.trusted,
-    ) as html.IFrameElement;
-
-    var iframeElement = xFrameBypassElement
+    var iframeElement = html.IFrameElement()
       ..id = 'id_$iframeViewType'
       ..name = 'name_$iframeViewType'
       ..style.border = 'none'
@@ -340,8 +280,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
       ..height = widget.height!.toInt().toString()
       ..allowFullscreen = widget.webSpecificParams.webAllowFullscreenContent;
 
-    widget.webSpecificParams.additionalSandboxOptions
-        .forEach(iframeElement.sandbox!.add);
+    widget.webSpecificParams.additionalSandboxOptions.forEach(iframeElement.sandbox!.add);
 
     if (widget.javascriptMode == JavascriptMode.unrestricted) {
       iframeElement.sandbox!.add('allow-scripts');
@@ -349,8 +288,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
     var allow = widget.webSpecificParams.additionalAllowOptions;
 
-    if (widget.initialMediaPlaybackPolicy ==
-        AutoMediaPlaybackPolicy.always_allow) {
+    if (widget.initialMediaPlaybackPolicy == AutoMediaPlaybackPolicy.always_allow) {
       allow.add('autoplay');
     }
 
@@ -358,16 +296,6 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
     return iframeElement;
   }
-
-  /* Maybe can be useful
-  html.DivElement _createDivWrapper(html.IFrameElement iframeToAppend) {
-    return html.DivElement()
-      ..id = 'div_$iframeViewType'
-      ..style.width = '100%'
-      ..style.height = '100%'
-      ..append(iframeToAppend);
-  }
-  */
 
   // Called when WebViewXController updates it's value
   //
@@ -392,9 +320,6 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
       case SourceType.URL_BYPASS:
         _connectJsToFlutter();
         break;
-      default:
-        _connectJsToFlutter();
-        break;
     }
 
     _updateSource(newContentModel);
@@ -408,9 +333,9 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
   // Updates the source depending if it is HTML or URL
   void _updateSource(ViewContentModel newContentModel) {
-    var source = newContentModel.content;
+    var content = newContentModel.content;
 
-    if (source.isEmpty) {
+    if (content.isEmpty) {
       _printIfDebug('Error: Cannot set empty source on webview');
       return;
     }
@@ -419,7 +344,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
       case SourceType.HTML:
         // ignore: unsafe_html
         iframe.srcdoc = HtmlUtils.preprocessSource(
-          source,
+          content,
           jsContent: widget.jsContent,
           windowDisambiguator: iframeViewType,
           forWeb: true,
@@ -427,7 +352,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
         break;
       case SourceType.URL:
       case SourceType.URL_BYPASS:
-        if (source == 'about:blank') {
+        if (content == 'about:blank') {
           // ignore: unsafe_html
           iframe.srcdoc = HtmlUtils.preprocessSource(
             '<br>',
@@ -437,33 +362,179 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
           );
           break;
         }
-        if (source.startsWith(RegExp('http[s]?', caseSensitive: false))) {
-          if (newContentModel.sourceType == SourceType.URL_BYPASS) {
-            var headers = newContentModel.headers;
-            if (widget.userAgent != null) {
-              headers[USER_AGENT_HEADERS_KEY] = widget.userAgent!;
-            }
-            var options = jsonEncode(headers);
-            var optionsIndicator =
-                '/[$BYPASS_URL_ADDITIONAL_OPTIONS_STARTING_POINT]';
-            var url =
-                source + optionsIndicator + base64Encode(utf8.encode(options));
 
-            //TODO Issue: On web, this only works the first time being used. When the user clicks a link,
-            // theese options are lost.
-
-            // ignore: unsafe_html
-            iframe.src = url;
-          } else {
-            iframe.contentWindow!.location.href = source;
-          }
-        } else {
+        if (!content.startsWith(RegExp('http[s]?://', caseSensitive: false))) {
           _printIfDebug('Error: Invalid URL supplied for webview.');
+          return;
+        }
+
+        if (newContentModel.sourceType == SourceType.URL) {
+          iframe.contentWindow!.location.href = content;
+        } else {
+          _tryFetchRemoteSource(
+            method: 'get',
+            url: content,
+            headers: newContentModel.headers,
+          );
         }
         break;
-      default:
-        break;
     }
+  }
+
+  void _handleOnIframeClick(dynamic onClickCallbackObject) {
+    if (onClickCallbackObject != null) {
+      final dartObj = js.JsObject.fromBrowserObject(onClickCallbackObject);
+      final href = dartObj['href'];
+
+      if (href == 'javascript:history.back()') {
+        webViewXController.goBack();
+        return;
+      } else if (href == 'javascript:history.forward()') {
+        webViewXController.goForward();
+        return;
+      } else {
+        // (ㆆ_ㆆ)
+      }
+
+      final method = dartObj['method'];
+      final body = dartObj['body'];
+
+      final bodyMap = body == null
+          ? null
+          : (<String, String>{}..addEntries(
+              (jsonDecode(body) as List<dynamic>).map(
+                (e) => MapEntry<String, String>(e[0] as String, e[1] as String),
+              ),
+            ));
+
+      _tryFetchRemoteSource(
+        method: method,
+        url: href,
+        headers: webViewXController.value.headers,
+        body: bodyMap,
+      );
+    }
+  }
+
+  void _tryFetchRemoteSource({
+    required String method,
+    required String url,
+    Map<String, String>? headers,
+    Map<String, String>? body,
+  }) {
+    _fetchPageSourceBypass(
+      method: 'get',
+      url: url,
+      headers: headers,
+      body: body,
+    ).then((source) {
+      _setPageSourceAfterBypass(url, source);
+
+      webViewXController.webAddHistory(HistoryEntry(
+        source: url,
+        sourceType: SourceType.URL_BYPASS,
+      ));
+    }).catchError((e) {
+      widget.onWebResourceError?.call(WebResourceError(
+        description: 'Failed to fetch the page at $url\nError:\n$e',
+        errorCode: WebResourceErrorType.connect.index,
+        errorType: WebResourceErrorType.connect,
+        domain: Uri.parse(url).authority,
+        failingUrl: url,
+      ));
+    });
+  }
+
+  Future<String> _fetchPageSourceBypass({
+    required String method,
+    required String url,
+    Map<String, String>? headers,
+    Map<String, String>? body,
+  }) async {
+    final proxyList = widget.webSpecificParams.proxyList;
+
+    if (widget.userAgent != null) {
+      (headers ??= <String, String>{}).putIfAbsent(
+        USER_AGENT_HEADERS_KEY,
+        () => widget.userAgent!,
+      );
+    }
+
+    for (var i = 0; i < proxyList.length; i++) {
+      final proxy = proxyList[i];
+      final proxiedUri = Uri.parse(proxy.buildProxyUrl(url));
+
+      Future<http.Response> request;
+
+      if (method == 'get') {
+        request = http.get(proxiedUri, headers: headers);
+      } else {
+        request = http.post(proxiedUri, headers: headers, body: body);
+      }
+
+      try {
+        final response = await request;
+        return proxy.extractPageSource(response.body);
+      } catch (e) {
+        print('Failed to fetch the page at $url from proxy ${proxy.runtimeType}.');
+
+        if (i == proxyList.length - 1) {
+          return Future.error(
+            'None of the provided proxies were able to fetch the given page.',
+          );
+        }
+
+        continue;
+      }
+    }
+
+    return Future.error('Bad state');
+  }
+
+  void _setPageSourceAfterBypass(String pageUrl, String pageSource) {
+    final replacedPageSource = HtmlUtils.embedInHtmlSource(
+      source: pageSource,
+      whatToEmbed: '''
+      <base href="$pageUrl">
+      <script>
+      document.addEventListener('click', e => {
+        if (frameElement && document.activeElement && document.activeElement.href) {
+          e.preventDefault()
+
+          var returnedObject = {method: 'get', href: document.activeElement.href};
+          frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK && frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK(returnedObject)
+        }
+      })
+      document.addEventListener('submit', e => {
+        if (frameElement && document.activeElement && document.activeElement.form && document.activeElement.form.action) {
+          e.preventDefault()
+
+          if (document.activeElement.form.method === 'post') {
+            var formData = new FormData(document.activeElement.form);
+            
+            var returnedObject = {method: 'post', href: document.activeElement.form.action, body: JSON.stringify([...formData])};
+            frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK && frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK(returnedObject)
+          } else {
+            var urlWithQueryParams = document.activeElement.form.action + '?' + new URLSearchParams(new FormData(document.activeElement.form))
+
+            var returnedObject = {method: 'get', href: urlWithQueryParams};
+            frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK && frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK(returnedObject)
+          }
+        }
+      })
+      </script>
+      ''',
+      position: EmbedPosition.BELOW_HEAD_OPEN_TAG,
+    );
+
+    // ignore: unsafe_html
+    iframe.srcdoc = HtmlUtils.preprocessSource(
+      replacedPageSource,
+      jsContent: widget.jsContent,
+      windowDisambiguator: iframeViewType,
+      forWeb: true,
+    );
+    _pageLoadFinished = true;
   }
 
   void _printIfDebug(String text) {

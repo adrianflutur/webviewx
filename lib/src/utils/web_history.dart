@@ -23,7 +23,7 @@ class HistoryStack {
   }
 
   /// Returns current history entry (i.e. current page)
-  HistoryEntry? get currentEntry => _currentEntry;
+  HistoryEntry get currentEntry => _currentEntry;
 
   /// Returns true if you can go back
   bool get canGoBack => _backHistory.isNotEmpty;

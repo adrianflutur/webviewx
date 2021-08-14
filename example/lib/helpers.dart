@@ -44,7 +44,7 @@ Widget createButton({
     child: ElevatedButton(
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 15.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
       ),
       child: Text(text),
     ),

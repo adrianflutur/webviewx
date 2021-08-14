@@ -1,10 +1,14 @@
 import 'package:webviewx/src/utils/css_loader.dart';
 import 'package:webviewx/src/utils/source_type.dart';
+import 'package:webviewx/src/utils/utils.dart';
 
 /// Parameters specific to the web version.
 ///
 /// This may merge with [MobileSpecificParams] in the future.
 class WebSpecificParams {
+  /// Proxies are used to bypass a website's iframe embedding restrictions
+  final List<BypassProxy> proxyList;
+
   /// Set this to true if you want to see in the console information about the current actions.
   /// It will print things such as current histroy stack every time you
   /// navigate, what iframes have started or finished loading etc.
@@ -24,6 +28,7 @@ class WebSpecificParams {
 
   /// Constructor
   const WebSpecificParams({
+    this.proxyList = BypassProxy.publicProxies,
     this.printDebugInfo = false,
     this.webAllowFullscreenContent = true,
     this.additionalSandboxOptions = const [

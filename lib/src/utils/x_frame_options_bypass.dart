@@ -79,7 +79,7 @@ class XFrameOptionsBypass {
                   document.addEventListener('click', e => {
                     if (frameElement && document.activeElement && document.activeElement.href) {
                       e.preventDefault()
-                      frameElement.contentWindow.$WEB_HISTORY_CALLBACK && frameElement.contentWindow.$WEB_HISTORY_CALLBACK(document.activeElement.href)
+                      frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK && frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK(document.activeElement.href)
 
                       frameElement.load(document.activeElement.href)
                     }
@@ -89,12 +89,12 @@ class XFrameOptionsBypass {
                       e.preventDefault()
 
                       if (document.activeElement.form.method === 'post') {
-                        frameElement.contentWindow.$WEB_HISTORY_CALLBACK && frameElement.contentWindow.$WEB_HISTORY_CALLBACK(document.activeElement.form.action)
+                        frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK && frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK(document.activeElement.form.action)
 
                         frameElement.load(document.activeElement.form.action, {method: 'post', body: new FormData(document.activeElement.form)})
                       } else {
                         var urlWithQueryParams = document.activeElement.form.action + '?' + new URLSearchParams(new FormData(document.activeElement.form))
-                        frameElement.contentWindow.$WEB_HISTORY_CALLBACK && frameElement.contentWindow.$WEB_HISTORY_CALLBACK(urlWithQueryParams)
+                        frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK && frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK(urlWithQueryParams)
 
                         frameElement.load(urlWithQueryParams)
                       }

@@ -1,4 +1,4 @@
-/// Enum, specifying what type is the current source
+/// Specifies what type is the current source
 enum SourceType {
   HTML,
   URL,
