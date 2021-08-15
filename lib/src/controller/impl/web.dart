@@ -5,49 +5,51 @@ import 'dart:async' show Future;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:webviewx/src/utils/source_type.dart';
 import 'package:webviewx/src/utils/utils.dart';
-import 'package:webviewx/src/utils/view_content_model.dart';
 import 'package:webviewx/src/utils/web_history.dart';
 
 import '../interface.dart' as i;
 
 /// Web implementation
-class WebViewXController extends ValueNotifier<ViewContentModel>
+class WebViewXController extends ChangeNotifier
     implements i.WebViewXController<js.JsObject> {
   /// JsObject connector
   @override
   late js.JsObject connector;
 
-  /// Boolean value notifier used to toggle ignoring gestures on the webview
   @override
-  ValueNotifier<bool> ignoreAllGesturesNotifier;
+  final bool printDebugInfo;
+
+  // Boolean value notifier used to toggle ignoring gestures on the webview
+  final ValueNotifier<bool> _ignoreAllGesturesNotifier;
 
   // Stack-based custom history
   // First entry is the current url, last entry is the initial url
-  final HistoryStack _history;
+  final HistoryStack<WebViewContent> _history;
 
-  bool printDebugInfo = false;
+  WebViewContent get value => _history.currentEntry;
 
   /// Constructor
   WebViewXController({
     required String initialContent,
     required SourceType initialSourceType,
     required bool ignoreAllGestures,
-  })   : ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
-        _history = HistoryStack(
-          initialEntry: HistoryEntry(
+    this.printDebugInfo = false,
+  })  : _ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
+        _history = HistoryStack<WebViewContent>(
+          initialEntry: WebViewContent(
             source: initialContent,
-            sourceType: initialSourceType,
-          ),
-        ),
-        super(
-          ViewContentModel(
-            content: initialContent,
             sourceType: initialSourceType,
           ),
         );
 
-  void _setContent(ViewContentModel model) {
-    value = model;
+  /// Boolean getter which reveals if the gestures are ignored right now
+  @override
+  bool get ignoresAllGestures => _ignoreAllGesturesNotifier.value;
+
+  /// Function to set ignoring gestures
+  @override
+  void setIgnoreAllGestures(bool value) {
+    _ignoreAllGesturesNotifier.value = value;
   }
 
   /// Returns true if the webview's current content is HTML
@@ -60,7 +62,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel>
 
   /// Returns true if the webview's current content is URL, and if
   /// [SourceType] is [SourceType.URL_BYPASS], which means it should
-  /// use the bypass to fetch the web page content.
+  /// use the proxy bypass to fetch the web page content.
   @override
   bool get isCurrentContentURLBypass => value.sourceType == SourceType.URL_BYPASS;
 
@@ -74,35 +76,33 @@ class WebViewXController extends ValueNotifier<ViewContentModel>
   Future<void> loadContent(
     String content,
     SourceType sourceType, {
-    Map<String, String> headers = const {},
+    Map<String, String>? headers,
+    Object? body,
     bool fromAssets = false,
   }) async {
     if (fromAssets) {
       var _content = await rootBundle.loadString(content);
-      _setContent(ViewContentModel(
-        content: _content,
-        headers: headers,
-        sourceType: sourceType,
-      ));
-      webAddHistory(HistoryEntry(source: _content, sourceType: sourceType));
+
+      webAddNewHistoryEntry(
+        WebViewContent(
+          source: _content,
+          sourceType: sourceType,
+          headers: headers,
+          webPostRequestBody: body,
+        ),
+      );
     } else {
-      _setContent(ViewContentModel(
-        content: content,
-        headers: headers,
-        sourceType: sourceType,
-      ));
-      webAddHistory(HistoryEntry(source: content, sourceType: sourceType));
+      webAddNewHistoryEntry(
+        WebViewContent(
+          source: content,
+          sourceType: sourceType,
+          headers: headers,
+          webPostRequestBody: body,
+        ),
+      );
     }
-  }
 
-  /// Boolean getter which reveals if the gestures are ignored right now
-  @override
-  bool get ignoringAllGestures => ignoreAllGesturesNotifier.value;
-
-  /// Function to set ignoring gestures
-  @override
-  void setIgnoreAllGestures(bool value) {
-    ignoreAllGesturesNotifier.value = value;
+    _notifyWidget();
   }
 
   /// This function allows you to call Javascript functions defined inside the webview.
@@ -148,30 +148,10 @@ class WebViewXController extends ValueNotifier<ViewContentModel>
     return Future<dynamic>.value(result);
   }
 
-  /// WEB-ONLY. YOU SHOULDN'T NEED TO CALL THIS FROM YOUR CODE.
-  ///
-  /// This is called internally by the web.dart view class, to add a new
-  /// iframe navigation history entry.
-  ///
-  /// This, and all history-related stuff is needed because the history on web
-  /// is basically reimplemented by me from scratch using the [HistoryEntry] class.
-  /// This had to be done because I couldn't intercept iframe's navigation events and
-  /// current url.
-  void webAddHistory(HistoryEntry entry) {
-    _history.addEntry(entry);
-    _printIfDebug('Got a new history entry: ${entry.source}\n');
-    _printIfDebug('History: ${_history.toString()}');
-  }
-
   /// Returns the current content
   @override
   Future<WebViewContent> getContent() {
-    return Future.value(
-      WebViewContent(
-        source: _history.currentEntry.source,
-        sourceType: _history.currentEntry.sourceType,
-      ),
-    );
+    return Future.value(value);
   }
 
   /// Returns a Future that completes with the value true, if you can go
@@ -184,12 +164,10 @@ class WebViewXController extends ValueNotifier<ViewContentModel>
   /// Go back in the history stack.
   @override
   Future<void> goBack() async {
-    var entry = _history.moveBack();
-    _setContent(ViewContentModel(
-      content: entry.source,
-      sourceType: entry.sourceType,
-    ));
+    _history.moveBack();
     _printIfDebug(_history.toString());
+
+    _notifyWidget();
   }
 
   /// Returns a Future that completes with the value true, if you can go
@@ -202,21 +180,44 @@ class WebViewXController extends ValueNotifier<ViewContentModel>
   /// Go forward in the history stack.
   @override
   Future<void> goForward() async {
-    var entry = _history.moveForward();
-    _setContent(ViewContentModel(
-      content: entry.source,
-      sourceType: entry.sourceType,
-    ));
+    _history.moveForward();
     _printIfDebug(_history.toString());
+
+    _notifyWidget();
   }
 
   /// Reload the current content.
   @override
   Future<void> reload() async {
-    _setContent(ViewContentModel(
-      content: _history.currentEntry.source,
-      sourceType: _history.currentEntry.sourceType,
-    ));
+    _notifyWidget();
+  }
+
+  // WEB-ONLY.
+  // YOU SHOULDN'T NEED TO CALL THIS FROM YOUR CODE.
+  //
+  // This is called internally by the web.dart view class, to add a new
+  // iframe navigation history entry.
+  //
+  // This, and all history-related stuff is needed because the history on web
+  // is basically reimplemented by me from scratch using the [HistoryEntry] class.
+  // This had to be done because I couldn't intercept iframe's navigation events and
+  // current url.
+  void webAddNewHistoryEntry(WebViewContent content) {
+    _history.addEntry(content);
+    _printIfDebug('Got a new history entry: ${content.source}\n');
+    _printIfDebug('History: ${_history.toString()}\n');
+  }
+
+  void _notifyWidget() {
+    notifyListeners();
+  }
+
+  void addIgnoreGesturesListener(void Function() cb) {
+    _ignoreAllGesturesNotifier.addListener(cb);
+  }
+
+  void removeIgnoreGesturesListener(void Function() cb) {
+    _ignoreAllGesturesNotifier.removeListener(cb);
   }
 
   void _printIfDebug(String text) {
@@ -228,7 +229,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel>
   /// Dispose resources
   @override
   void dispose() {
-    ignoreAllGesturesNotifier.dispose();
+    _ignoreAllGesturesNotifier.dispose();
     super.dispose();
   }
 }

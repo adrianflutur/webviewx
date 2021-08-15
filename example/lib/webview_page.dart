@@ -77,7 +77,7 @@ class _WebViewXPageState extends State<WebViewXPage> {
   }
 
   void _toggleIgnore() {
-    var ignoring = webviewController.ignoringAllGestures;
+    var ignoring = webviewController.ignoresAllGestures;
     webviewController.setIgnoreAllGestures(!ignoring);
     showSnackBar('Ignore events = ${!ignoring}', context);
   }

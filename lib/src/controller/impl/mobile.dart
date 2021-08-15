@@ -6,35 +6,45 @@ import 'dart:async' show Future;
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:webviewx/src/utils/source_type.dart';
 import 'package:webviewx/src/utils/utils.dart';
-import 'package:webviewx/src/utils/view_content_model.dart';
 import '../interface.dart' as i;
 
 /// Mobile implementation
-class WebViewXController extends ValueNotifier<ViewContentModel>
+class WebViewXController extends ChangeNotifier
     implements i.WebViewXController<WebViewController> {
   /// Webview controller connector
   @override
   late WebViewController connector;
 
-  /// Boolean value notifier used to toggle ignoring gestures on the webview
   @override
-  ValueNotifier<bool> ignoreAllGesturesNotifier;
+  final bool printDebugInfo;
+
+  /// Boolean value notifier used to toggle ignoring gestures on the webview
+  final ValueNotifier<bool> _ignoreAllGesturesNotifier;
+
+  late WebViewContent value;
 
   /// Constructor
   WebViewXController({
     required String initialContent,
     required SourceType initialSourceType,
     required bool ignoreAllGestures,
-  })   : ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
-        super(
-          ViewContentModel(
-            content: initialContent,
-            sourceType: initialSourceType,
-          ),
+    this.printDebugInfo = false,
+  })  : _ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
+        value = WebViewContent(
+          source: initialContent,
+          sourceType: initialSourceType,
         );
 
-  void _setContent(ViewContentModel model) {
-    value = model;
+  void updateCurrentValue(WebViewContent newModel) => value = newModel;
+
+  /// Boolean getter which reveals if the gestures are ignored right now
+  @override
+  bool get ignoresAllGestures => _ignoreAllGesturesNotifier.value;
+
+  /// Function to set ignoring gestures
+  @override
+  void setIgnoreAllGestures(bool value) {
+    _ignoreAllGesturesNotifier.value = value;
   }
 
   /// Returns true if the webview's current content is HTML
@@ -61,33 +71,29 @@ class WebViewXController extends ValueNotifier<ViewContentModel>
   Future<void> loadContent(
     String content,
     SourceType sourceType, {
-    Map<String, String> headers = const {},
+    Map<String, String>? headers,
+    Object? body,
     bool fromAssets = false,
   }) async {
     if (fromAssets) {
       final _content = await rootBundle.loadString(content);
-      _setContent(ViewContentModel(
-        content: _content,
-        headers: headers,
+
+      value = WebViewContent(
+        source: _content,
         sourceType: sourceType,
-      ));
+        headers: headers,
+        webPostRequestBody: body,
+      );
     } else {
-      _setContent(ViewContentModel(
-        content: content,
-        headers: headers,
+      value = WebViewContent(
+        source: content,
         sourceType: sourceType,
-      ));
+        headers: headers,
+        webPostRequestBody: body,
+      );
     }
-  }
 
-  /// Boolean getter which reveals if the gestures are ignored right now
-  @override
-  bool get ignoringAllGestures => ignoreAllGesturesNotifier.value;
-
-  /// Function to set ignoring gestures
-  @override
-  void setIgnoreAllGestures(bool value) {
-    ignoreAllGesturesNotifier.value = value;
+    _notifyWidget();
   }
 
   /// This function allows you to call Javascript functions defined inside the webview.
@@ -143,16 +149,16 @@ class WebViewXController extends ValueNotifier<ViewContentModel>
   @override
   Future<WebViewContent> getContent() async {
     var currentContent = await connector.currentUrl();
+    var currentSourceType = value.sourceType;
 
-    //TODO clicking new urls should update (at least) the current sourcetype, and maybe the content
-    var parsedContent = Uri.tryParse(currentContent!);
-    if (parsedContent != null && parsedContent.data != null) {
-      currentContent = Uri.decodeFull(currentContent);
+    if (currentContent!.substring(0, 5) == 'data:') {
+      currentContent = HtmlUtils.dataUriToHtml(currentContent);
+      currentSourceType = SourceType.HTML;
     }
 
-    return WebViewContent(
+    return value.copyWith(
       source: currentContent,
-      sourceType: value.sourceType,
+      sourceType: currentSourceType,
     );
   }
 
@@ -165,8 +171,12 @@ class WebViewXController extends ValueNotifier<ViewContentModel>
 
   /// Go back in the history stack.
   @override
-  Future<void> goBack() {
-    return connector.goBack();
+  Future<void> goBack() async {
+    if (await canGoBack()) {
+      await connector.goBack();
+      final liveContent = await getContent();
+      value = liveContent;
+    }
   }
 
   /// Returns a Future that completes with the value true, if you can go
@@ -178,8 +188,12 @@ class WebViewXController extends ValueNotifier<ViewContentModel>
 
   /// Go forward in the history stack.
   @override
-  Future<void> goForward() {
-    return connector.goForward();
+  Future<void> goForward() async {
+    if (await canGoForward()) {
+      await connector.goForward();
+      final liveContent = await connector.currentUrl();
+      value = value.copyWith(source: liveContent);
+    }
   }
 
   /// Reload the current content.
@@ -188,10 +202,22 @@ class WebViewXController extends ValueNotifier<ViewContentModel>
     return connector.reload();
   }
 
+  void addIgnoreGesturesListener(void Function() cb) {
+    _ignoreAllGesturesNotifier.addListener(cb);
+  }
+
+  void removeIgnoreGesturesListener(void Function() cb) {
+    _ignoreAllGesturesNotifier.removeListener(cb);
+  }
+
+  void _notifyWidget() {
+    notifyListeners();
+  }
+
   /// Dispose resources
   @override
   void dispose() {
-    ignoreAllGesturesNotifier.dispose();
+    _ignoreAllGesturesNotifier.dispose();
     super.dispose();
   }
 }

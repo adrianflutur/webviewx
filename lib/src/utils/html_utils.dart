@@ -82,19 +82,24 @@ class HtmlUtils {
     }
 
     if (encodeHtml) {
-      _src = _encodeHtmlToURI(_src);
+      _src = encodeHtmlToURI(_src);
     }
 
     return _src;
   }
 
   /// Encodes HTML to URI
-  static String _encodeHtmlToURI(String src) {
+  static String encodeHtmlToURI(String src) {
     return Uri.dataFromString(
       src,
       mimeType: 'text/html',
       encoding: Encoding.getByName('utf-8'),
     ).toString();
+  }
+
+  /// Turns URI-encoded HTML "data:" to pure human-readable HTML
+  static String dataUriToHtml(String data) {
+    return Uri.decodeFull(data).replaceFirst(RegExp(r'^data:.+,'), '');
   }
 
   /// Retrieves basename from a string path

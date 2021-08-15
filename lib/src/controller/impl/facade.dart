@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:webviewx/src/utils/source_type.dart';
-import 'package:webviewx/src/utils/view_content_model.dart';
-import 'package:webviewx/src/utils/web_history.dart';
 import 'package:webviewx/src/utils/webview_content_model.dart';
 
 import '../interface.dart' as i;
@@ -9,8 +7,7 @@ import '../interface.dart' as i;
 /// Facade controller
 ///
 /// Throws UnimplementedError if used.
-class WebViewXController extends ValueNotifier<ViewContentModel>
-    implements i.WebViewXController<dynamic> {
+class WebViewXController extends ChangeNotifier implements i.WebViewXController<dynamic> {
   /// Cross-platform webview connector
   ///
   /// At runtime, this will be WebViewController, JsObject or other concrete
@@ -18,22 +15,24 @@ class WebViewXController extends ValueNotifier<ViewContentModel>
   @override
   late dynamic connector;
 
-  /// Boolean value notifier used to toggle ignoring gestures on the webview
   @override
-  ValueNotifier<bool> ignoreAllGesturesNotifier;
+  final bool printDebugInfo;
 
   /// Constructor
   WebViewXController({
     required String initialContent,
     required SourceType initialSourceType,
     required bool ignoreAllGestures,
-  })   : ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
-        super(
-          ViewContentModel(
-            content: initialContent,
-            sourceType: initialSourceType,
-          ),
-        );
+    this.printDebugInfo = false,
+  });
+
+  /// Boolean getter which reveals if the gestures are ignored right now
+  @override
+  bool get ignoresAllGestures => throw UnimplementedError();
+
+  /// Function to set ignoring gestures
+  @override
+  void setIgnoreAllGestures(bool value) => throw UnimplementedError();
 
   /// Returns true if the webview's current content is HTML
   @override
@@ -59,18 +58,11 @@ class WebViewXController extends ValueNotifier<ViewContentModel>
   Future<void> loadContent(
     String content,
     SourceType sourceType, {
-    Map<String, String> headers = const {},
+    Map<String, String>? headers,
+    Object? body,
     bool fromAssets = false,
   }) =>
       throw UnimplementedError();
-
-  /// Boolean getter which reveals if the gestures are ignored right now
-  @override
-  bool get ignoringAllGestures => throw UnimplementedError();
-
-  /// Function to set ignoring gestures
-  @override
-  void setIgnoreAllGestures(bool value) => throw UnimplementedError();
 
   /// This function allows you to call Javascript functions defined inside the webview.
   ///

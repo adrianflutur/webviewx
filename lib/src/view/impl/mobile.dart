@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:webviewx/src/utils/utils.dart';
-import 'package:webviewx/src/utils/view_content_model.dart';
 
 import 'package:webview_flutter/platform_interface.dart' as wf_pi;
 import 'package:webview_flutter/webview_flutter.dart' as wf;
@@ -144,9 +143,11 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
     final javascriptMode = wf.JavascriptMode.values.singleWhere(
       (value) => value.toString() == widget.javascriptMode.toString(),
     );
+
     final initialMediaPlaybackPolicy = wf.AutoMediaPlaybackPolicy.values.singleWhere(
       (value) => value.toString() == widget.initialMediaPlaybackPolicy.toString(),
     );
+
     final onWebResourceError = (wf_pi.WebResourceError err) => widget.onWebResourceError!(
           WebResourceError(
             description: err.description,
@@ -158,21 +159,36 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
             failingUrl: err.failingUrl,
           ),
         );
+
     final navigationDelegate = (wf.NavigationRequest request) async {
       if (widget.mobileSpecificParams.navigationDelegate == null) {
+        webViewXController.updateCurrentValue(
+          webViewXController.value.copyWith(source: request.url),
+        );
         return wf.NavigationDecision.navigate;
       }
 
-      var delegate = await widget.mobileSpecificParams.navigationDelegate!.call(
+      final delegate = await widget.mobileSpecificParams.navigationDelegate!.call(
         NavigationRequest(
           content: request.url,
           isForMainFrame: request.isForMainFrame,
         ),
       );
-      return wf.NavigationDecision.values.singleWhere(
-        (value) => value.toString() == delegate.toString(),
-      );
+
+      switch (delegate) {
+        case NavigationDecision.navigate:
+          // When clicking on an URL, the sourceType stays the same.
+          // That's because you cannot move from URL to HTML just by clicking.
+          // Also we don't take URL_BYPASS into consideration because it has no effect here in mobile
+          webViewXController.updateCurrentValue(
+            webViewXController.value.copyWith(source: request.url),
+          );
+          return wf.NavigationDecision.navigate;
+        case NavigationDecision.prevent:
+          return wf.NavigationDecision.prevent;
+      }
     };
+
     final onWebViewCreated = (wf.WebViewController webViewController) {
       originalWebViewController = webViewController;
 
@@ -182,6 +198,7 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
         widget.onWebViewCreated!(webViewXController);
       }
     };
+
     final javascriptChannels = widget.dartCallBacks
         .map(
           (cb) => wf.JavascriptChannel(
@@ -238,46 +255,44 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
       ignoreAllGestures: _ignoreAllGestures,
     )
       ..addListener(_handleChange)
-      ..ignoreAllGesturesNotifier.addListener(
-        _handleIgnoreGesturesChange,
-      );
+      ..addIgnoreGesturesListener(_handleIgnoreGesturesChange);
   }
 
   // Prepares the source depending if it is HTML or URL
-  String _prepareContent(ViewContentModel model) {
+  String _prepareContent(WebViewContent model) {
     if (model.sourceType == SourceType.HTML) {
       return HtmlUtils.preprocessSource(
-        model.content,
+        model.source,
         jsContent: widget.jsContent,
 
         // Needed for mobile webview in order to URI-encode the HTML
         encodeHtml: true,
       );
     }
-    return model.content;
+    return model.source;
   }
 
   // Called when WebViewXController updates it's value
   void _handleChange() {
-    final newContentModel = webViewXController.value;
+    final newModel = webViewXController.value;
 
     originalWebViewController.loadUrl(
-      _prepareContent(newContentModel),
-      headers: newContentModel.headers,
+      _prepareContent(newModel),
+      headers: newModel.headers,
     );
   }
 
   // Called when the ValueNotifier inside WebViewXController updates it's value
   void _handleIgnoreGesturesChange() {
     setState(() {
-      _ignoreAllGestures = webViewXController.ignoringAllGestures;
+      _ignoreAllGestures = webViewXController.ignoresAllGestures;
     });
   }
 
   @override
   void dispose() {
     webViewXController.removeListener(_handleChange);
-    webViewXController.ignoreAllGesturesNotifier.removeListener(
+    webViewXController.removeIgnoreGesturesListener(
       _handleIgnoreGesturesChange,
     );
     super.dispose();

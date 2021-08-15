@@ -1,6 +1,4 @@
-import 'package:flutter/material.dart';
 import 'package:webviewx/src/utils/source_type.dart';
-import 'package:webviewx/src/utils/web_history.dart';
 import 'package:webviewx/src/utils/webview_content_model.dart';
 
 /// Interface for controller
@@ -11,16 +9,22 @@ abstract class WebViewXController<T> {
   /// controller implementation
   late T connector;
 
-  /// Boolean value notifier used to toggle ignoring gestures on the webview
-  ValueNotifier<bool> ignoreAllGesturesNotifier;
+  /// Whether to print the debug info to the console.
+  final bool printDebugInfo;
 
   /// Constructor
   WebViewXController({
     required String initialContent,
     required SourceType initialSourceType,
     required bool ignoreAllGestures,
-    bool printDebugInfo = false,
-  }) : ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures);
+    this.printDebugInfo = false,
+  });
+
+  /// Boolean getter which reveals if the gestures are ignored right now
+  bool get ignoresAllGestures;
+
+  /// Function to set ignoring gestures
+  void setIgnoreAllGestures(bool value);
 
   /// Returns true if the webview's current content is HTML
   bool get isCurrentContentHTML;
@@ -42,15 +46,10 @@ abstract class WebViewXController<T> {
   Future<void> loadContent(
     String content,
     SourceType sourceType, {
-    Map<String, String> headers = const {},
+    Map<String, String>? headers,
+    Object? body,
     bool fromAssets = false,
   });
-
-  /// Boolean getter which reveals if the gestures are ignored right now
-  bool get ignoringAllGestures;
-
-  /// Function to set ignoring gestures
-  void setIgnoreAllGestures(bool value);
 
   /// This function allows you to call Javascript functions defined inside the webview.
   ///
