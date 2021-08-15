@@ -7,13 +7,17 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:webviewx/src/utils/source_type.dart';
 import 'package:webviewx/src/utils/utils.dart';
 import 'package:webviewx/src/utils/view_content_model.dart';
+import '../interface.dart' as i;
 
 /// Mobile implementation
-class WebViewXController extends ValueNotifier<ViewContentModel> {
+class WebViewXController extends ValueNotifier<ViewContentModel>
+    implements i.WebViewXController<WebViewController> {
   /// Webview controller connector
+  @override
   late WebViewController connector;
 
   /// Boolean value notifier used to toggle ignoring gestures on the webview
+  @override
   ValueNotifier<bool> ignoreAllGesturesNotifier;
 
   /// Constructor
@@ -34,14 +38,17 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Returns true if the webview's current content is HTML
+  @override
   bool get isCurrentContentHTML => value.sourceType == SourceType.HTML;
 
   /// Returns true if the webview's current content is URL
+  @override
   bool get isCurrentContentURL => value.sourceType == SourceType.URL;
 
   /// Returns true if the webview's current content is URL, and if
   /// [SourceType] is [SourceType.URL_BYPASS], which means it should
   /// use the bypass to fetch the web page content.
+  @override
   bool get isCurrentContentURLBypass => value.sourceType == SourceType.URL_BYPASS;
 
   /// Set webview content to the specified URL.
@@ -50,6 +57,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// If [fromAssets] param is set to true,
   /// [url] param must be a String path to an asset
   /// Example: 'assets/some_url.txt'
+  @override
   Future<void> loadContent(
     String content,
     SourceType sourceType, {
@@ -73,9 +81,11 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Boolean getter which reveals if the gestures are ignored right now
+  @override
   bool get ignoringAllGestures => ignoreAllGesturesNotifier.value;
 
   /// Function to set ignoring gestures
+  @override
   void setIgnoreAllGestures(bool value) {
     ignoreAllGesturesNotifier.value = value;
   }
@@ -96,6 +106,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// print(resultFromJs); // prints "This is a test"
   /// ```
   //TODO This should return an error if the operation failed, but it doesn't
+  @override
   Future<dynamic> callJsMethod(
     String name,
     List<dynamic> params,
@@ -120,6 +131,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// in the 'window' context, instead of doing it inside the corresponding iframe's 'window'
   ///
   /// For more info, check Mozilla documentation on 'window'
+  @override
   Future<dynamic> evalRawJavascript(
     String rawJavascript, {
     bool inGlobalContext = false, // NO-OP HERE
@@ -128,6 +140,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Returns the current content
+  @override
   Future<WebViewContent> getContent() async {
     var currentContent = await connector.currentUrl();
 
@@ -145,27 +158,32 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
 
   /// Returns a Future that completes with the value true, if you can go
   /// back in the history stack.
+  @override
   Future<bool> canGoBack() {
     return connector.canGoBack();
   }
 
   /// Go back in the history stack.
+  @override
   Future<void> goBack() {
     return connector.goBack();
   }
 
   /// Returns a Future that completes with the value true, if you can go
   /// forward in the history stack.
+  @override
   Future<bool> canGoForward() {
     return connector.canGoForward();
   }
 
   /// Go forward in the history stack.
+  @override
   Future<void> goForward() {
     return connector.goForward();
   }
 
   /// Reload the current content.
+  @override
   Future<void> reload() {
     return connector.reload();
   }

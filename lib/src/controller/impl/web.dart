@@ -8,12 +8,17 @@ import 'package:webviewx/src/utils/utils.dart';
 import 'package:webviewx/src/utils/view_content_model.dart';
 import 'package:webviewx/src/utils/web_history.dart';
 
+import '../interface.dart' as i;
+
 /// Web implementation
-class WebViewXController extends ValueNotifier<ViewContentModel> {
+class WebViewXController extends ValueNotifier<ViewContentModel>
+    implements i.WebViewXController<js.JsObject> {
   /// JsObject connector
+  @override
   late js.JsObject connector;
 
   /// Boolean value notifier used to toggle ignoring gestures on the webview
+  @override
   ValueNotifier<bool> ignoreAllGesturesNotifier;
 
   // Stack-based custom history
@@ -46,14 +51,17 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Returns true if the webview's current content is HTML
+  @override
   bool get isCurrentContentHTML => value.sourceType == SourceType.HTML;
 
   /// Returns true if the webview's current content is URL
+  @override
   bool get isCurrentContentURL => value.sourceType == SourceType.URL;
 
   /// Returns true if the webview's current content is URL, and if
   /// [SourceType] is [SourceType.URL_BYPASS], which means it should
   /// use the bypass to fetch the web page content.
+  @override
   bool get isCurrentContentURLBypass => value.sourceType == SourceType.URL_BYPASS;
 
   /// Set webview content to the specified URL.
@@ -62,6 +70,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// If [fromAssets] param is set to true,
   /// [url] param must be a String path to an asset
   /// Example: 'assets/some_url.txt'
+  @override
   Future<void> loadContent(
     String content,
     SourceType sourceType, {
@@ -87,9 +96,11 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Boolean getter which reveals if the gestures are ignored right now
+  @override
   bool get ignoringAllGestures => ignoreAllGesturesNotifier.value;
 
   /// Function to set ignoring gestures
+  @override
   void setIgnoreAllGestures(bool value) {
     ignoreAllGesturesNotifier.value = value;
   }
@@ -109,6 +120,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// var resultFromJs = await callJsMethod('someFunction', ['test'])
   /// print(resultFromJs); // prints "This is a test"
   /// ```
+  @override
   Future<dynamic> callJsMethod(
     String name,
     List<dynamic> params,
@@ -124,6 +136,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   /// in the 'window' context, instead of doing it inside the corresponding iframe's 'window'
   ///
   /// For more info, check Mozilla documentation on 'window'
+  @override
   Future<dynamic> evalRawJavascript(
     String rawJavascript, {
     bool inGlobalContext = false,
@@ -151,6 +164,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Returns the current content
+  @override
   Future<WebViewContent> getContent() {
     return Future.value(
       WebViewContent(
@@ -162,11 +176,13 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
 
   /// Returns a Future that completes with the value true, if you can go
   /// back in the history stack.
+  @override
   Future<bool> canGoBack() {
     return Future.value(_history.canGoBack);
   }
 
   /// Go back in the history stack.
+  @override
   Future<void> goBack() async {
     var entry = _history.moveBack();
     _setContent(ViewContentModel(
@@ -178,11 +194,13 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
 
   /// Returns a Future that completes with the value true, if you can go
   /// forward in the history stack.
+  @override
   Future<bool> canGoForward() {
     return Future.value(_history.canGoForward);
   }
 
   /// Go forward in the history stack.
+  @override
   Future<void> goForward() async {
     var entry = _history.moveForward();
     _setContent(ViewContentModel(
@@ -193,6 +211,7 @@ class WebViewXController extends ValueNotifier<ViewContentModel> {
   }
 
   /// Reload the current content.
+  @override
   Future<void> reload() async {
     _setContent(ViewContentModel(
       content: _history.currentEntry.source,
