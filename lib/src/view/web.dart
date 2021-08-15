@@ -378,17 +378,17 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
 
   void _handleOnIframeClick(dynamic onClickCallbackObject) {
     if (onClickCallbackObject != null) {
-      final dartObj = js.JsObject.fromBrowserObject(onClickCallbackObject);
+      final dartObj = jsonDecode(onClickCallbackObject) as Map<String, dynamic>;
       final href = dartObj['href'];
+      _printIfDebug(dartObj.toString());
 
+      // (ㆆ_ㆆ)
       if (href == 'javascript:history.back()') {
         webViewXController.goBack();
         return;
       } else if (href == 'javascript:history.forward()') {
         webViewXController.goForward();
         return;
-      } else {
-        // (ㆆ_ㆆ)
       }
 
       final method = dartObj['method'];
@@ -397,8 +397,8 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
       final bodyMap = body == null
           ? null
           : (<String, String>{}..addEntries(
-              (jsonDecode(body) as List<dynamic>).map(
-                (e) => MapEntry<String, String>(e[0] as String, e[1] as String),
+              (body as List<dynamic>).map(
+                (e) => MapEntry<String, String>(e[0].toString(), e[1].toString()),
               ),
             ));
 
@@ -496,7 +496,16 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
         if (frameElement && document.activeElement && document.activeElement.href) {
           e.preventDefault()
 
-          var returnedObject = {method: 'get', href: document.activeElement.href};
+          var blob = new Blob(['<html>test</html>'], {type : 'text/html'});
+          blob["name"] = "blobFile";
+          var formData = new FormData();
+          formData.append('field1', 1);
+          formData.append('field2', 'value2');
+          formData.append('field3', 'value3.1');
+          formData.append('field3', 'value3.2');
+          formData.append('blobfile', blob);
+
+          var returnedObject = JSON.stringify({method: 'get', href: document.activeElement.href, body: [...formData]});
           frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK && frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK(returnedObject)
         }
       })
@@ -507,12 +516,12 @@ class _WebViewXWidgetState extends State<WebViewXWidget> {
           if (document.activeElement.form.method === 'post') {
             var formData = new FormData(document.activeElement.form);
             
-            var returnedObject = {method: 'post', href: document.activeElement.form.action, body: JSON.stringify([...formData])};
+            var returnedObject = JSON.stringify({method: 'post', href: document.activeElement.form.action, body: [...formData]});
             frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK && frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK(returnedObject)
           } else {
             var urlWithQueryParams = document.activeElement.form.action + '?' + new URLSearchParams(new FormData(document.activeElement.form))
 
-            var returnedObject = {method: 'get', href: urlWithQueryParams};
+            var returnedObject = JSON.stringify({method: 'get', href: urlWithQueryParams});
             frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK && frameElement.contentWindow.$WEB_ON_CLICK_INSIDE_IFRAME_CALLBACK(returnedObject)
           }
         }
