@@ -1,13 +1,19 @@
+/// Proxy which will be used to fetch page sources in the [SourceType.urlBypass] mode.
 abstract class BypassProxy {
+  /// Builds the proxied url
   String buildProxyUrl(String pageUrl);
+
+  /// Returns the page source from the response body
   String extractPageSource(String responseBody);
 
+  /// A default list of public proxies
   static const publicProxies = <BypassProxy>[
     BridgedBypassProxy(),
     CodeTabsBypassProxy(),
   ];
 }
 
+/// cors.bridged.cc proxy
 class BridgedBypassProxy implements BypassProxy {
   const BridgedBypassProxy();
 
@@ -22,6 +28,7 @@ class BridgedBypassProxy implements BypassProxy {
   }
 }
 
+/// api.codetabs.com proxy
 class CodeTabsBypassProxy implements BypassProxy {
   const CodeTabsBypassProxy();
 
@@ -38,7 +45,7 @@ class CodeTabsBypassProxy implements BypassProxy {
 
 /* 
 Example for when the proxy's response is not the page source directly,
-but it's a JSON object.
+but instead it's a JSON object.
 
 Such as this: {"response": "<html><head>......."}
 

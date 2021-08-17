@@ -1,13 +1,15 @@
-import 'package:flutter/material.dart';
+import 'dart:async' show Future;
+// ignore: avoid_web_libraries_in_flutter
 import 'dart:js' as js;
 
-import 'dart:async' show Future;
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:webviewx/src/utils/logger.dart';
 import 'package:webviewx/src/utils/source_type.dart';
 import 'package:webviewx/src/utils/utils.dart';
 import 'package:webviewx/src/utils/web_history.dart';
 
-import '../interface.dart' as i;
+import 'package:webviewx/src/controller/interface.dart' as i;
 
 /// Web implementation
 class WebViewXController extends ChangeNotifier
@@ -16,9 +18,6 @@ class WebViewXController extends ChangeNotifier
   @override
   late js.JsObject connector;
 
-  @override
-  final bool printDebugInfo;
-
   // Boolean value notifier used to toggle ignoring gestures on the webview
   final ValueNotifier<bool> _ignoreAllGesturesNotifier;
 
@@ -26,6 +25,7 @@ class WebViewXController extends ChangeNotifier
   // First entry is the current url, last entry is the initial url
   final HistoryStack<WebViewContent> _history;
 
+  /// INTERNAL
   WebViewContent get value => _history.currentEntry;
 
   /// Constructor
@@ -33,8 +33,7 @@ class WebViewXController extends ChangeNotifier
     required String initialContent,
     required SourceType initialSourceType,
     required bool ignoreAllGestures,
-    this.printDebugInfo = false,
-  })  : _ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
+  })   : _ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
         _history = HistoryStack<WebViewContent>(
           initialEntry: WebViewContent(
             source: initialContent,
@@ -54,24 +53,30 @@ class WebViewXController extends ChangeNotifier
 
   /// Returns true if the webview's current content is HTML
   @override
-  bool get isCurrentContentHTML => value.sourceType == SourceType.HTML;
+  bool get isCurrentContentHTML => value.sourceType == SourceType.html;
 
   /// Returns true if the webview's current content is URL
   @override
-  bool get isCurrentContentURL => value.sourceType == SourceType.URL;
+  bool get isCurrentContentURL => value.sourceType == SourceType.url;
 
   /// Returns true if the webview's current content is URL, and if
-  /// [SourceType] is [SourceType.URL_BYPASS], which means it should
+  /// [SourceType] is [SourceType.urlBypass], which means it should
   /// use the proxy bypass to fetch the web page content.
   @override
-  bool get isCurrentContentURLBypass => value.sourceType == SourceType.URL_BYPASS;
+  bool get isCurrentContentURLBypass => value.sourceType == SourceType.urlBypass;
 
-  /// Set webview content to the specified URL.
-  /// Example URL: https://flutter.dev
+  /// Set webview content to the specified `content`.
+  /// Example: https://flutter.dev/
+  /// Example2: '<html><head></head> <body> <p> Hi </p> </body></html>
   ///
-  /// If [fromAssets] param is set to true,
-  /// [url] param must be a String path to an asset
-  /// Example: 'assets/some_url.txt'
+  /// If `fromAssets` param is set to true,
+  /// `content` param must be a String path to an asset
+  /// Example: `assets/some_url.txt`
+  ///
+  /// `headers` are optional HTTP headers.
+  ///
+  /// `body` is only used on the WEB version, when clicking on a submit button in a form
+  ///
   @override
   Future<void> loadContent(
     String content,
@@ -80,28 +85,27 @@ class WebViewXController extends ChangeNotifier
     Object? body,
     bool fromAssets = false,
   }) async {
-    if (fromAssets) {
-      var _content = await rootBundle.loadString(content);
+    WebViewContent newContent;
 
-      webAddNewHistoryEntry(
-        WebViewContent(
-          source: _content,
-          sourceType: sourceType,
-          headers: headers,
-          webPostRequestBody: body,
-        ),
+    if (fromAssets) {
+      final _contentFromAssets = await rootBundle.loadString(content);
+
+      newContent = WebViewContent(
+        source: _contentFromAssets,
+        sourceType: sourceType,
+        headers: headers,
+        webPostRequestBody: body,
       );
     } else {
-      webAddNewHistoryEntry(
-        WebViewContent(
-          source: content,
-          sourceType: sourceType,
-          headers: headers,
-          webPostRequestBody: body,
-        ),
+      newContent = WebViewContent(
+        source: content,
+        sourceType: sourceType,
+        headers: headers,
+        webPostRequestBody: body,
       );
     }
 
+    webRegisterNewHistoryEntry(newContent);
     _notifyWidget();
   }
 
@@ -125,7 +129,7 @@ class WebViewXController extends ChangeNotifier
     String name,
     List<dynamic> params,
   ) {
-    var result = connector.callMethod(name, params);
+    final result = connector.callMethod(name, params);
     return Future<dynamic>.value(result);
   }
 
@@ -141,7 +145,7 @@ class WebViewXController extends ChangeNotifier
     String rawJavascript, {
     bool inGlobalContext = false,
   }) {
-    var result = (inGlobalContext ? js.context : connector).callMethod(
+    final result = (inGlobalContext ? js.context : connector).callMethod(
       'eval',
       [rawJavascript],
     );
@@ -165,7 +169,7 @@ class WebViewXController extends ChangeNotifier
   @override
   Future<void> goBack() async {
     _history.moveBack();
-    _printIfDebug(_history.toString());
+    log('Current history: ${_history.toString()}');
 
     _notifyWidget();
   }
@@ -181,7 +185,7 @@ class WebViewXController extends ChangeNotifier
   @override
   Future<void> goForward() async {
     _history.moveForward();
-    _printIfDebug(_history.toString());
+    log('Current history: ${_history.toString()}');
 
     _notifyWidget();
   }
@@ -192,38 +196,72 @@ class WebViewXController extends ChangeNotifier
     _notifyWidget();
   }
 
-  // WEB-ONLY.
-  // YOU SHOULDN'T NEED TO CALL THIS FROM YOUR CODE.
-  //
-  // This is called internally by the web.dart view class, to add a new
-  // iframe navigation history entry.
-  //
-  // This, and all history-related stuff is needed because the history on web
-  // is basically reimplemented by me from scratch using the [HistoryEntry] class.
-  // This had to be done because I couldn't intercept iframe's navigation events and
-  // current url.
-  void webAddNewHistoryEntry(WebViewContent content) {
+  /// Get scroll position on X axis
+  @override
+  Future<int> getScrollX() {
+    return Future.value(int.tryParse(connector["scrollX"].toString()));
+  }
+
+  /// Get scroll position on Y axis
+  @override
+  Future<int> getScrollY() {
+    return Future.value(int.tryParse(connector["scrollY"].toString()));
+  }
+
+  /// Scrolls by `x` on X axis and by `y` on Y axis
+  @override
+  Future<void> scrollBy(int x, int y) {
+    return callJsMethod('scrollBy', [x, y]);
+  }
+
+  /// Scrolls exactly to the position `(x, y)`
+  @override
+  Future<void> scrollTo(int x, int y) {
+    return callJsMethod('scrollTo', [x, y]);
+  }
+
+  /// Retrieves the inner page title
+  @override
+  Future<String?> getTitle() {
+    return Future.value(connector["document"]["title"].toString());
+  }
+
+  /// Clears cache
+  @override
+  Future<void> clearCache() {
+    connector["localStorage"].callMethod("clear", []);
+    evalRawJavascript(
+      'caches.keys().then((keyList) => Promise.all(keyList.map((key) => caches.delete(key))))',
+    );
+    return reload();
+  }
+
+  /// INTERNAL
+  /// WEB-ONLY
+  ///
+  /// This is called internally by the web.dart view class, to add a new
+  /// iframe navigation history entry.
+  ///
+  /// This, and all history-related stuff is needed because the history on web
+  /// is basically reimplemented by me from scratch using the [HistoryEntry] class.
+  /// This had to be done because I couldn't intercept iframe's navigation events and
+  /// current url.
+  void webRegisterNewHistoryEntry(WebViewContent content) {
     _history.addEntry(content);
-    _printIfDebug('Got a new history entry: ${content.source}\n');
-    _printIfDebug('History: ${_history.toString()}\n');
   }
 
-  void _notifyWidget() {
-    notifyListeners();
-  }
-
+  /// INTERNAL
   void addIgnoreGesturesListener(void Function() cb) {
     _ignoreAllGesturesNotifier.addListener(cb);
   }
 
+  /// INTERNAL
   void removeIgnoreGesturesListener(void Function() cb) {
     _ignoreAllGesturesNotifier.removeListener(cb);
   }
 
-  void _printIfDebug(String text) {
-    if (printDebugInfo) {
-      print(text);
-    }
+  void _notifyWidget() {
+    notifyListeners();
   }
 
   /// Dispose resources

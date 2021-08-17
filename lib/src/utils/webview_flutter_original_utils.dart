@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+import 'package:webviewx/src/utils/source_type.dart';
+
 /// A copy from the original webview's navigation delegate typedef
 typedef NavigationDelegate = FutureOr<NavigationDecision> Function(
   NavigationRequest navigation,
@@ -20,13 +23,13 @@ enum AutoMediaPlaybackPolicy {
   ///
   /// For example: JavaScript code cannot start playing media unless the code was executed
   /// as a result of a user action (like a touch event).
-  require_user_action_for_all_media_types,
+  requireUserActionForAllMediaTypes,
 
   /// Starting any kind of media playback is always allowed.
   ///
   /// For example: JavaScript code that's triggered when the page is loaded can start playing
   /// video or audio.
-  always_allow,
+  alwaysAllow,
 }
 
 /// A decision on how to handle a navigation request.
@@ -43,20 +46,38 @@ enum NavigationDecision {
 /// This was needed because I couldn't extract the information I needed from inside the webview package.
 class NavigationRequest {
   /// Constructor
-  NavigationRequest({
+  const NavigationRequest({
     required this.content,
     required this.isForMainFrame,
   });
 
   /// The URL that will be loaded if the navigation is executed.
-  final String content;
+  // final String content;
+  final NavigationContent content;
 
   /// Whether the navigation request is to be loaded as the main frame.
   final bool isForMainFrame;
 
   @override
   String toString() {
-    return '$runtimeType(content: $content, isForMainFrame: $isForMainFrame)';
+    return 'NavigationRequest(content: $content, isForMainFrame: $isForMainFrame)';
+  }
+}
+
+/// Used in [NavigationRequest] in order to also send the `sourceType`, not just the `source`
+class NavigationContent {
+  /// Source of the incoming page
+  final String source;
+
+  /// SourceType of the incoming page
+  final SourceType sourceType;
+
+  /// Constructor
+  const NavigationContent(this.source, this.sourceType);
+
+  @override
+  String toString() {
+    return 'NavigationContent(source: $source, sourceType: ${describeEnum(sourceType)})';
   }
 }
 
@@ -66,7 +87,7 @@ class WebResourceError {
   ///
   /// A user should not need to instantiate this class, but will receive one in
   /// [WebResourceErrorCallback].
-  WebResourceError({
+  const WebResourceError({
     required this.errorCode,
     required this.description,
     this.domain,

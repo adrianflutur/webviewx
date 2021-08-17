@@ -51,9 +51,7 @@ class HistoryStack<T> {
   T moveBack() {
     _forwardHistory.addFirst(_currentEntry);
 
-    _currentEntry = _backHistory.removeLast();
-
-    return _currentEntry;
+    return _currentEntry = _backHistory.removeLast();
   }
 
   /// Function to move forward in history.
@@ -61,8 +59,6 @@ class HistoryStack<T> {
   T moveForward() {
     _backHistory.addLast(_currentEntry);
 
-    _currentEntry = _forwardHistory.removeFirst();
-
-    return _currentEntry;
+    return _currentEntry = _forwardHistory.removeFirst();
   }
 }

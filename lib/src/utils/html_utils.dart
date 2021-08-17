@@ -3,38 +3,37 @@ import 'dart:typed_data';
 import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 import 'package:webviewx/src/utils/constants.dart';
-
-import 'embedded_js_content.dart';
+import 'package:webviewx/src/utils/embedded_js_content.dart';
 
 /// Specifies where to embed ("burn") the javascript inside the HTML source
 enum EmbedPosition {
-  BELOW_BODY_OPEN_TAG,
-  ABOVE_BODY_CLOSE_TAG,
-  BELOW_HEAD_OPEN_TAG,
-  ABOVE_HEAD_CLOSE_TAG,
+  belowBodyOpenTag,
+  aboveBodyCloseTag,
+  belowHeadOpenTag,
+  aboveHeadCloseTag,
 }
 
 /// HTML utils: wrappers, parsers, splitters etc.
 class HtmlUtils {
   /// Checks if the source looks like HTML
   static bool isFullHtmlPage(String src) {
-    var _src = src.trim().toLowerCase();
-    return _src.startsWith(RegExp(r'<!DOCTYPE html>', caseSensitive: false)) &&
+    final _src = src.trim().toLowerCase();
+    return _src.startsWith(RegExp('<!DOCTYPE html>', caseSensitive: false)) &&
         // I didn't forget the closing bracket here.
         // Html opening tag may also have some random attributes.
-        _src.contains(RegExp(r'<html', caseSensitive: false)) &&
-        _src.contains(RegExp(r'</html>', caseSensitive: false));
+        _src.contains(RegExp('<html', caseSensitive: false)) &&
+        _src.contains(RegExp('</html>', caseSensitive: false));
   }
 
   /// Wraps markup in HTML tags
-  static String wrapHtml(String src) {
+  static String wrapHtml(String src, String? iframeId) {
     return '''
     <!DOCTYPE html>
     <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Iframe</title>
+        <title>Iframe ${iframeId ?? ''}</title>
     </head>
     <body>
     $src
@@ -58,7 +57,7 @@ class HtmlUtils {
     var _src = src;
 
     if (!isFullHtmlPage(_src)) {
-      _src = wrapHtml(_src);
+      _src = wrapHtml(_src, windowDisambiguator);
     }
 
     if (forWeb) {
@@ -66,8 +65,8 @@ class HtmlUtils {
     }
 
     if (jsContent.isNotEmpty) {
-      var jsContentStrings = <String>{};
-      for (var jsToEmbed in jsContent) {
+      final jsContentStrings = <String>{};
+      for (final jsToEmbed in jsContent) {
         if (jsToEmbed.js != null) {
           jsContentStrings.add(jsToEmbed.js!);
         } else {
@@ -99,7 +98,7 @@ class HtmlUtils {
 
   /// Turns URI-encoded HTML "data:" to pure human-readable HTML
   static String dataUriToHtml(String data) {
-    return Uri.decodeFull(data).replaceFirst(RegExp(r'^data:.+,'), '');
+    return Uri.decodeFull(data).replaceFirst(RegExp('^data:.+,'), '');
   }
 
   /// Retrieves basename from a string path
@@ -111,15 +110,15 @@ class HtmlUtils {
   ///
   /// Pretty raw, I know, but it works
   static String encodeImageAsEmbeddedBase64(String fileName, Uint8List imageBytes) {
-    var imageWidth = '100%';
-    var base64Image = '<img width=\"$imageWidth\" src=\"data:image/png;base64, '
-        '${base64Encode(imageBytes)}\" data-filename=\"$fileName\">';
+    const imageWidth = '100%';
+    final base64Image = '<img width="$imageWidth" src="data:image/png;base64, '
+        '${base64Encode(imageBytes)}" data-filename="$fileName">';
     return base64Image;
   }
 
   /// Wraps an image link with "img" tags
   static String wrapImageLinkWithImgTag(String imageLink) {
-    return '<img src=\"$imageLink\">';
+    return '<img src="$imageLink">';
   }
 
   /// Builds a js function using the name and params passed to it.
@@ -127,16 +126,19 @@ class HtmlUtils {
   /// Example call: buildJsFunction('say', ["hello", "world"]);
   /// Result: say('hello', 'world')
   static String buildJsFunction(String name, List<dynamic> params) {
-    var args = '';
+    final args = StringBuffer();
+
     if (params.isEmpty) {
-      return name + '()';
+      return '$name()';
     }
-    params.forEach((param) {
-      args += addSingleQuotes(param.toString());
-      args += ',';
-    });
-    args = args.substring(0, args.length - 1);
-    var function = name + '(' + '$args' + ')';
+
+    for (final param in params) {
+      args.write(addSingleQuotes(param.toString()));
+      args.write(',');
+    }
+
+    final noEndingCommaArgs = args.toString().substring(0, args.length - 1);
+    final function = '$name($noEndingCommaArgs)';
 
     return function;
   }
@@ -151,14 +153,14 @@ class HtmlUtils {
   static String embedJsInHtmlSource(
     String source,
     Set<String> jsContents, {
-    EmbedPosition position = EmbedPosition.ABOVE_BODY_CLOSE_TAG,
+    EmbedPosition position = EmbedPosition.aboveBodyCloseTag,
   }) {
-    var newLine = '\n';
-    var scriptOpenTag = '<script>';
-    var scriptCloseTag = '</script>';
-    var jsContent = jsContents.reduce((prev, elem) => prev + newLine * 2 + elem);
+    const newLine = '\n';
+    const scriptOpenTag = '<script>';
+    const scriptCloseTag = '</script>';
+    final jsContent = jsContents.reduce((prev, elem) => prev + newLine * 2 + elem);
 
-    var whatToEmbed = newLine +
+    final whatToEmbed = newLine +
         scriptOpenTag +
         newLine +
         jsContent +
@@ -193,22 +195,22 @@ class HtmlUtils {
     required EmbedPosition position,
   }) {
     switch (position) {
-      case EmbedPosition.BELOW_HEAD_OPEN_TAG:
+      case EmbedPosition.belowHeadOpenTag:
         return injectAsChildOf('head', source, whatToEmbed);
-      case EmbedPosition.BELOW_BODY_OPEN_TAG:
+      case EmbedPosition.belowBodyOpenTag:
         return injectAsChildOf('body', source, whatToEmbed);
-      case EmbedPosition.ABOVE_HEAD_CLOSE_TAG:
+      case EmbedPosition.aboveHeadCloseTag:
         final indexToSplit = source.indexOf('</head>');
         final splitSource1 = source.substring(0, indexToSplit);
         final splitSource2 = source.substring(indexToSplit);
 
-        return splitSource1 + whatToEmbed + '\n' + splitSource2;
-      case EmbedPosition.ABOVE_BODY_CLOSE_TAG:
+        return '$splitSource1$whatToEmbed\n$splitSource2';
+      case EmbedPosition.aboveBodyCloseTag:
         final indexToSplit = source.indexOf('</body>');
         final splitSource1 = source.substring(0, indexToSplit);
         final splitSource2 = source.substring(indexToSplit);
 
-        return splitSource1 + whatToEmbed + '\n' + splitSource2;
+        return '$splitSource1$whatToEmbed\n$splitSource2';
     }
   }
 
@@ -228,9 +230,9 @@ class HtmlUtils {
     return embedJsInHtmlSource(
       source,
       {
-        'parent.$JS_DART_CONNECTOR_FN$windowDisambiguator && parent.$JS_DART_CONNECTOR_FN$windowDisambiguator(window)'
+        'parent.$jsToDartConnectorFN$windowDisambiguator && parent.$jsToDartConnectorFN$windowDisambiguator(window)'
       },
-      position: EmbedPosition.ABOVE_HEAD_CLOSE_TAG,
+      position: EmbedPosition.aboveHeadCloseTag,
     );
   }
 
@@ -239,17 +241,55 @@ class HtmlUtils {
   ///
   /// The '-' replace had to be done in order to follow the javascript syntax notation.
   static String buildIframeViewType() {
-    var iframeId = '_' + Uuid().v4().replaceAll('-', '_');
-    var viewType = '_iframe$iframeId';
-    return viewType;
+    final iframeId = '_${const Uuid().v4().replaceAll('-', '_')}';
+    return '_iframe$iframeId';
   }
 
   /// Removes surrounding quotes around a string, if any
   static String unQuoteJsResponseIfNeeded(String rawJsResponse) {
-    if ((rawJsResponse.startsWith('\"') && rawJsResponse.endsWith('\"')) ||
-        (rawJsResponse.startsWith('\'') && rawJsResponse.endsWith('\''))) {
+    if ((rawJsResponse.startsWith('"') && rawJsResponse.endsWith('"')) ||
+        (rawJsResponse.startsWith("'") && rawJsResponse.endsWith("'"))) {
       return rawJsResponse.substring(1, rawJsResponse.length - 1);
     }
     return rawJsResponse;
+  }
+
+  /// Embeds click listeners inside the page and calls Dart callback when triggered
+  static String embedClickListenersInPageSource(String pageUrl, String pageSource) {
+    return embedInHtmlSource(
+      source: pageSource,
+      whatToEmbed: '''
+      <base href="$pageUrl">
+      <script>
+
+      document.addEventListener('click', e => {
+        if (frameElement && document.activeElement && document.activeElement.href) {
+          e.preventDefault()
+
+          var returnedObject = JSON.stringify({method: 'get', href: document.activeElement.href});
+          frameElement.contentWindow.$webOnClickInsideIframeCallback && frameElement.contentWindow.$webOnClickInsideIframeCallback(returnedObject)
+        }
+      })
+      document.addEventListener('submit', e => {
+        if (frameElement && document.activeElement && document.activeElement.form && document.activeElement.form.action) {
+          e.preventDefault()
+
+          if (document.activeElement.form.method === 'post') {
+            var formData = new FormData(document.activeElement.form);
+            
+            var returnedObject = JSON.stringify({method: 'post', href: document.activeElement.form.action, body: [...formData]});
+            frameElement.contentWindow.$webOnClickInsideIframeCallback && frameElement.contentWindow.$webOnClickInsideIframeCallback(returnedObject)
+          } else {
+            var urlWithQueryParams = document.activeElement.form.action + '?' + new URLSearchParams(new FormData(document.activeElement.form))
+
+            var returnedObject = JSON.stringify({method: 'get', href: urlWithQueryParams});
+            frameElement.contentWindow.$webOnClickInsideIframeCallback && frameElement.contentWindow.$webOnClickInsideIframeCallback(returnedObject)
+          }
+        }
+      })
+      </script>
+      ''',
+      position: EmbedPosition.belowHeadOpenTag,
+    );
   }
 }

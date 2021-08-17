@@ -1,18 +1,16 @@
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
 import 'package:webviewx/src/utils/utils.dart';
 
 import 'package:webviewx/src/view/interface.dart' as view_interface;
 import 'package:webviewx/src/controller/interface.dart' as ctrl_interface;
-import 'mobile.dart' as mobile;
+
+import 'package:webviewx/src/view/impl/mobile.dart' as mobile;
 
 /// IO implementation
 ///
-/// This will build the correct widget for the current platform, if available.
-class WebViewXWidget extends StatefulWidget implements view_interface.WebViewXWidget {
+/// Will build the coresponding widget for the current IO platform
+class WebViewX extends StatelessWidget implements view_interface.WebViewX {
   /// Initial content
   @override
   final String initialContent;
@@ -21,12 +19,12 @@ class WebViewXWidget extends StatefulWidget implements view_interface.WebViewXWi
   ///
   /// Example:
   /// If you set [initialContent] to '<p>hi</p>', then you should
-  /// also set the [initialSourceType] accordingly, that is [SourceType.HTML].
+  /// also set the [initialSourceType] accordingly, that is [SourceType.html].
   @override
   final SourceType initialSourceType;
 
   /// User-agent
-  /// On web, this is only used when using [SourceType.URL_BYPASS]
+  /// On web, this is only used when using [SourceType.urlBypass]
   @override
   final String? userAgent;
 
@@ -41,7 +39,7 @@ class WebViewXWidget extends StatefulWidget implements view_interface.WebViewXWi
   /// Callback which returns a referrence to the [WebViewXController]
   /// being created.
   @override
-  final void Function(ctrl_interface.WebViewXController controller)? onWebViewCreated;
+  final Function(ctrl_interface.WebViewXController controller)? onWebViewCreated;
 
   /// A set of [EmbeddedJsContent].
   ///
@@ -84,6 +82,10 @@ class WebViewXWidget extends StatefulWidget implements view_interface.WebViewXWi
   @override
   final void Function(String src)? onPageFinished;
 
+  /// Callback to decide whether to allow navigation to the incoming url
+  @override
+  final NavigationDelegate? navigationDelegate;
+
   /// Callback for when something goes wrong in while page or resources load.
   @override
   final void Function(WebResourceError error)? onWebResourceError;
@@ -101,10 +103,10 @@ class WebViewXWidget extends StatefulWidget implements view_interface.WebViewXWi
   final MobileSpecificParams mobileSpecificParams;
 
   /// Constructor
-  WebViewXWidget({
+  const WebViewX({
     Key? key,
     this.initialContent = 'about:blank',
-    this.initialSourceType = SourceType.URL,
+    this.initialSourceType = SourceType.url,
     this.userAgent,
     this.width,
     this.height,
@@ -114,45 +116,38 @@ class WebViewXWidget extends StatefulWidget implements view_interface.WebViewXWi
     this.ignoreAllGestures = false,
     this.javascriptMode = JavascriptMode.unrestricted,
     this.initialMediaPlaybackPolicy =
-        AutoMediaPlaybackPolicy.require_user_action_for_all_media_types,
+        AutoMediaPlaybackPolicy.requireUserActionForAllMediaTypes,
     this.onPageStarted,
     this.onPageFinished,
+    this.navigationDelegate,
     this.onWebResourceError,
     this.webSpecificParams = const WebSpecificParams(),
     this.mobileSpecificParams = const MobileSpecificParams(),
   }) : super(key: key);
 
   @override
-  _WebViewXWidgetState createState() => _WebViewXWidgetState();
-}
-
-class _WebViewXWidgetState extends State<WebViewXWidget> {
-  @override
   Widget build(BuildContext context) {
-    if (Platform.isAndroid || Platform.isIOS) {
-      return mobile.WebViewXWidget(
-        key: widget.key,
-        initialContent: widget.initialContent,
-        initialSourceType: widget.initialSourceType,
-        userAgent: widget.userAgent,
-        width: widget.width,
-        height: widget.height,
-        dartCallBacks: widget.dartCallBacks,
-        jsContent: widget.jsContent,
-        onWebViewCreated: widget.onWebViewCreated,
-        ignoreAllGestures: widget.ignoreAllGestures,
-        javascriptMode: widget.javascriptMode,
-        initialMediaPlaybackPolicy: widget.initialMediaPlaybackPolicy,
-        onPageStarted: widget.onPageStarted,
-        onPageFinished: widget.onPageFinished,
-        onWebResourceError: widget.onWebResourceError,
-        webSpecificParams: widget.webSpecificParams,
-        mobileSpecificParams: widget.mobileSpecificParams,
+    return LayoutBuilder(builder: (context, constraints) {
+      return mobile.WebViewX(
+        key: key,
+        initialContent: initialContent,
+        initialSourceType: initialSourceType,
+        userAgent: userAgent,
+        width: width ?? constraints.maxWidth,
+        height: height ?? constraints.maxHeight,
+        dartCallBacks: dartCallBacks,
+        jsContent: jsContent,
+        onWebViewCreated: onWebViewCreated,
+        ignoreAllGestures: ignoreAllGestures,
+        javascriptMode: javascriptMode,
+        initialMediaPlaybackPolicy: initialMediaPlaybackPolicy,
+        onPageStarted: onPageStarted,
+        onPageFinished: onPageFinished,
+        navigationDelegate: navigationDelegate,
+        onWebResourceError: onWebResourceError,
+        webSpecificParams: webSpecificParams,
+        mobileSpecificParams: mobileSpecificParams,
       );
-    } else {
-      throw UnimplementedError(
-        'WebViewX (IO) is not yet implemented for the current platform.).',
-      );
-    }
+    });
   }
 }

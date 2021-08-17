@@ -18,7 +18,7 @@ class WebViewContent {
   final Object? webPostRequestBody;
 
   /// Constructor
-  WebViewContent({
+  const WebViewContent({
     required this.source,
     required this.sourceType,
     this.headers,
@@ -40,7 +40,7 @@ class WebViewContent {
 
   @override
   String toString() {
-    return '\WebViewContent:\n'
+    return 'WebViewContent:\n'
         'Source: $source\n'
         'SourceType: ${describeEnum(sourceType)}\n'
         'Last request Headers: ${headers ?? 'none'}\n'

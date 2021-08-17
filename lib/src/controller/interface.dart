@@ -9,17 +9,6 @@ abstract class WebViewXController<T> {
   /// controller implementation
   late T connector;
 
-  /// Whether to print the debug info to the console.
-  final bool printDebugInfo;
-
-  /// Constructor
-  WebViewXController({
-    required String initialContent,
-    required SourceType initialSourceType,
-    required bool ignoreAllGestures,
-    this.printDebugInfo = false,
-  });
-
   /// Boolean getter which reveals if the gestures are ignored right now
   bool get ignoresAllGestures;
 
@@ -33,16 +22,22 @@ abstract class WebViewXController<T> {
   bool get isCurrentContentURL;
 
   /// Returns true if the webview's current content is URL, and if
-  /// [SourceType] is [SourceType.URL_BYPASS], which means it should
+  /// [SourceType] is [SourceType.urlBypass], which means it should
   /// use the bypass to fetch the web page content.
   bool get isCurrentContentURLBypass;
 
-  /// Set webview content to the specified URL.
-  /// Example URL: https://flutter.dev
+  /// Set webview content to the specified `content`.
+  /// Example: https://flutter.dev/
+  /// Example2: '<html><head></head> <body> <p> Hi </p> </body></html>
   ///
-  /// If [fromAssets] param is set to true,
-  /// [url] param must be a String path to an asset
-  /// Example: 'assets/some_url.txt'
+  /// If `fromAssets` param is set to true,
+  /// `content` param must be a String path to an asset
+  /// Example: `assets/some_url.txt`
+  ///
+  /// `headers` are optional HTTP headers.
+  ///
+  /// `body` is only used on the WEB version, when clicking on a submit button in a form
+  ///
   Future<void> loadContent(
     String content,
     SourceType sourceType, {
@@ -83,17 +78,6 @@ abstract class WebViewXController<T> {
     bool inGlobalContext = false,
   });
 
-  /// WEB-ONLY. YOU SHOULDN'T NEED TO CALL THIS FROM YOUR CODE.
-  ///
-  /// This is called internally by the web.dart view class, to add a new
-  /// iframe navigation history entry.
-  ///
-  /// This, and all history-related stuff is needed because the history on web
-  /// is basically reimplemented by me from scratch using the [HistoryEntry] class.
-  /// This had to be done because I couldn't intercept iframe's navigation events and
-  /// current url.
-  // void webAddHistory(HistoryEntry entry) => throw UnimplementedError();
-
   /// Returns the current content
   Future<WebViewContent> getContent();
 
@@ -113,6 +97,24 @@ abstract class WebViewXController<T> {
 
   /// Reload the current content.
   Future<void> reload();
+
+  /// Get scroll position on X axis
+  Future<int> getScrollX();
+
+  /// Get scroll position on Y axis
+  Future<int> getScrollY();
+
+  /// Scrolls by `x` on X axis and by `y` on Y axis
+  Future<void> scrollBy(int x, int y);
+
+  /// Scrolls exactly to the position `(x, y)`
+  Future<void> scrollTo(int x, int y);
+
+  /// Retrieves the inner page title
+  Future<String?> getTitle();
+
+  /// Clears cache
+  Future<void> clearCache();
 
   /// Dispose resources
   void dispose();
