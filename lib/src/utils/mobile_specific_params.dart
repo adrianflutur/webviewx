@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
-import 'webview_flutter_original_utils.dart';
 
 /// Parameters specific to the mobile version.
 ///
@@ -36,9 +35,6 @@ class MobileSpecificParams {
   final Set<Factory<OneSequenceGestureRecognizer>>? mobileGestureRecognizers;
 
   /// Same as the original one from webview_flutter.
-  final NavigationDelegate? navigationDelegate;
-
-  /// Same as the original one from webview_flutter.
   final bool debuggingEnabled;
 
   /// Same as the original one from webview_flutter.
@@ -48,7 +44,6 @@ class MobileSpecificParams {
   const MobileSpecificParams({
     this.mobileGestureRecognizers,
     this.gestureNavigationEnabled = false,
-    this.navigationDelegate,
     this.debuggingEnabled = false,
   });
 }

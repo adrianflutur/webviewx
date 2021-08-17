@@ -13,7 +13,7 @@ class WebViewAware extends StatelessWidget {
   final bool debug;
 
   /// Constructor
-  WebViewAware({
+  const WebViewAware({
     Key? key,
     required this.child,
     this.debug = false,

@@ -1,3 +1,3 @@
-export 'facade.dart'
-    if (dart.library.io) 'mobile.dart'
-    if (dart.library.html) 'web.dart';
+export 'impl/facade.dart'
+    if (dart.library.io) 'impl/io.dart'
+    if (dart.library.html) 'impl/web.dart';

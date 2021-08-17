@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:webviewx/webviewx.dart';
 
@@ -17,7 +16,7 @@ void showAlertDialog(String content, BuildContext context) {
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,
-            child: Text('Close'),
+            child: const Text('Close'),
           ),
         ],
       ),
@@ -40,13 +39,11 @@ Widget createButton({
   VoidCallback? onTap,
   required String text,
 }) {
-  return Container(
-    child: ElevatedButton(
-      onPressed: onTap,
-      style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(horizontal: 5.0, vertical: 15.0),
-      ),
-      child: Text(text),
+  return ElevatedButton(
+    onPressed: onTap,
+    style: ElevatedButton.styleFrom(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
     ),
+    child: Text(text),
   );
 }

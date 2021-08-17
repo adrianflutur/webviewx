@@ -16,20 +16,23 @@
 /// ),
 /// ```
 ///
-/// And then, from the Javascript side, when some action happens:
-/// (for more about the Web and Mobile different call types see [EmbeddedJsContent])
+/// And then, from the Javascript side, when you need to call back Dart from JS:
+///
+/// Calling Dart from JS, on Web:
 ///
 /// ```javascript
-/// ...
-/// From Web:
-///
 /// Unique_Name_Here('test');
-///
-/// From Mobile:
-///
-/// Unique_Name_Here.postMessage('test');
-/// ...
 /// ```
+///
+///
+/// Calling Dart from JS, on Mobile:
+///
+/// ```javascript
+/// Unique_Name_Here.postMessage('test');
+///
+/// ```
+/// For more about the Web and Mobile different call types see [EmbeddedJsContent]
+///
 class DartCallback {
   /// Callback's name
   ///
