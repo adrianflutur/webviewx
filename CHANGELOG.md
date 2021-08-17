@@ -1,3 +1,28 @@
+## 0.2.0
+
+- Deprecated pedantic. Adopted lint instead.
+- Abstracted the controller and the widget. Soon it will be possible to add multiple implementations, such as windows, macOs or linux.
+- Renamed SourceType enum and AutoMediaPlaybackPolicy enums acording to lint rules (camelCase instead of SCREAM_CASE)
+- (web) Moved huge part of JS logic to Dart = better control over what happens there (might move it all to Dart soon)
+- (web) Added the option to supply your own list of BypassProxy objects. This means anyone can now spin up their own proxy server and add it to the list, if they don't want to run on the default public ones.
+- (web) Implemented navigationDelegate
+- (web) Fixed onPageStarted and onPageFinished callbacks. Now they provide the correct information.
+- (web) Implemented missing features from WebviewXController which were available on mobile:
+
+```
+    Future getScrollX();
+    Future getScrollY();
+    Future scrollBy(int x, int y);
+    Future scrollTo(int x, int y);
+    Future<String?> getTitle();
+    Future clearCache();
+```
+
+- (mobile) Fixed sourceType desync
+- (mobile) Fixed URI data: source messing up sometimes due to the encoding
+- Update documentation
+- Update dependencies
+
 ## 0.1.0
 
 - Migrated to null safety

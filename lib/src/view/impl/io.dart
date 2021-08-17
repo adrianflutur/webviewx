@@ -39,7 +39,8 @@ class WebViewX extends StatelessWidget implements view_interface.WebViewX {
   /// Callback which returns a referrence to the [WebViewXController]
   /// being created.
   @override
-  final Function(ctrl_interface.WebViewXController controller)? onWebViewCreated;
+  final Function(ctrl_interface.WebViewXController controller)?
+      onWebViewCreated;
 
   /// A set of [EmbeddedJsContent].
   ///

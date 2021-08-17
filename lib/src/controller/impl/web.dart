@@ -63,7 +63,8 @@ class WebViewXController extends ChangeNotifier
   /// [SourceType] is [SourceType.urlBypass], which means it should
   /// use the proxy bypass to fetch the web page content.
   @override
-  bool get isCurrentContentURLBypass => value.sourceType == SourceType.urlBypass;
+  bool get isCurrentContentURLBypass =>
+      value.sourceType == SourceType.urlBypass;
 
   /// Set webview content to the specified `content`.
   /// Example: https://flutter.dev/

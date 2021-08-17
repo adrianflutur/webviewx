@@ -81,8 +81,10 @@ class _WebViewXPageState extends State<WebViewXPage> {
       initialContent: initialContent,
       initialSourceType: SourceType.html,
       onWebViewCreated: (controller) => webviewController = controller,
-      onPageStarted: (src) => debugPrint('A new page has started loading: $src\n'),
-      onPageFinished: (src) => debugPrint('The page has finished loading: $src\n'),
+      onPageStarted: (src) =>
+          debugPrint('A new page has started loading: $src\n'),
+      onPageFinished: (src) =>
+          debugPrint('The page has finished loading: $src\n'),
       jsContent: const {
         EmbeddedJsContent(
           js: "function testPlatformIndependentMethod() { console.log('Hi from JS') }",
@@ -197,7 +199,8 @@ class _WebViewXPageState extends State<WebViewXPage> {
 
   Future<void> _callPlatformSpecificJsMethod() async {
     try {
-      await webviewController.callJsMethod('testPlatformSpecificMethod', ['Hi']);
+      await webviewController
+          .callJsMethod('testPlatformSpecificMethod', ['Hi']);
     } catch (e) {
       showAlertDialog(
         executeJsErrorMessage,
@@ -285,7 +288,8 @@ class _WebViewXPageState extends State<WebViewXPage> {
       ),
       buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),
       createButton(
-        text: 'Call platform specific Js method, that calls back a Dart function',
+        text:
+            'Call platform specific Js method, that calls back a Dart function',
         onTap: _callPlatformSpecificJsMethod,
       ),
       buildSpace(direction: Axis.vertical, flex: false, amount: 20.0),

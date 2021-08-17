@@ -46,7 +46,8 @@ class WebViewX extends StatefulWidget implements view_interface.WebViewX {
   /// Callback which returns a referrence to the [WebViewXController]
   /// being created.
   @override
-  final Function(ctrl_interface.WebViewXController controller)? onWebViewCreated;
+  final Function(ctrl_interface.WebViewXController controller)?
+      onWebViewCreated;
 
   /// A set of [EmbeddedJsContent].
   ///
@@ -365,7 +366,8 @@ class _WebViewXState extends State<WebViewX> {
 
     final allow = widget.webSpecificParams.additionalAllowOptions;
 
-    if (widget.initialMediaPlaybackPolicy == AutoMediaPlaybackPolicy.alwaysAllow) {
+    if (widget.initialMediaPlaybackPolicy ==
+        AutoMediaPlaybackPolicy.alwaysAllow) {
       allow.add('autoplay');
     }
 
@@ -461,7 +463,8 @@ class _WebViewXState extends State<WebViewX> {
     final href = dartObj['href'] as String;
     _debugLog(dartObj.toString());
 
-    if (!await _checkNavigationAllowed(href, webViewXController.value.sourceType)) {
+    if (!await _checkNavigationAllowed(
+        href, webViewXController.value.sourceType)) {
       _debugLog('Navigation not allowed for source:\n$href\n');
       return;
     }

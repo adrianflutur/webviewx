@@ -41,7 +41,8 @@ class WebViewX extends StatefulWidget implements view_interface.WebViewX {
   /// Callback which returns a referrence to the [WebViewXController]
   /// being created.
   @override
-  final Function(ctrl_interface.WebViewXController controller)? onWebViewCreated;
+  final Function(ctrl_interface.WebViewXController controller)?
+      onWebViewCreated;
 
   /// A set of [EmbeddedJsContent].
   ///
@@ -151,12 +152,13 @@ class _WebViewXState extends State<WebViewX> {
         ? wf.JavascriptMode.unrestricted
         : wf.JavascriptMode.disabled;
 
-    final initialMediaPlaybackPolicy =
-        widget.initialMediaPlaybackPolicy == AutoMediaPlaybackPolicy.alwaysAllow
-            ? wf.AutoMediaPlaybackPolicy.always_allow
-            : wf.AutoMediaPlaybackPolicy.require_user_action_for_all_media_types;
+    final initialMediaPlaybackPolicy = widget.initialMediaPlaybackPolicy ==
+            AutoMediaPlaybackPolicy.alwaysAllow
+        ? wf.AutoMediaPlaybackPolicy.always_allow
+        : wf.AutoMediaPlaybackPolicy.require_user_action_for_all_media_types;
 
-    void onWebResourceError(wf_pi.WebResourceError err) => widget.onWebResourceError!(
+    void onWebResourceError(wf_pi.WebResourceError err) =>
+        widget.onWebResourceError!(
           WebResourceError(
             description: err.description,
             errorCode: err.errorCode,
@@ -172,13 +174,15 @@ class _WebViewXState extends State<WebViewX> {
       wf.NavigationRequest request,
     ) async {
       if (widget.navigationDelegate == null) {
-        webViewXController.value = webViewXController.value.copyWith(source: request.url);
+        webViewXController.value =
+            webViewXController.value.copyWith(source: request.url);
         return wf.NavigationDecision.navigate;
       }
 
       final delegate = await widget.navigationDelegate!.call(
         NavigationRequest(
-          content: NavigationContent(request.url, webViewXController.value.sourceType),
+          content: NavigationContent(
+              request.url, webViewXController.value.sourceType),
           isForMainFrame: request.isForMainFrame,
         ),
       );
@@ -225,12 +229,14 @@ class _WebViewXState extends State<WebViewX> {
         javascriptMode: javascriptMode,
         onWebViewCreated: onWebViewCreated,
         javascriptChannels: javascriptChannels,
-        gestureRecognizers: widget.mobileSpecificParams.mobileGestureRecognizers,
+        gestureRecognizers:
+            widget.mobileSpecificParams.mobileGestureRecognizers,
         onPageStarted: widget.onPageStarted,
         onPageFinished: widget.onPageFinished,
         initialMediaPlaybackPolicy: initialMediaPlaybackPolicy,
         onWebResourceError: onWebResourceError,
-        gestureNavigationEnabled: widget.mobileSpecificParams.gestureNavigationEnabled,
+        gestureNavigationEnabled:
+            widget.mobileSpecificParams.gestureNavigationEnabled,
         debuggingEnabled: widget.mobileSpecificParams.debuggingEnabled,
         navigationDelegate: navigationDelegate,
         userAgent: widget.userAgent,

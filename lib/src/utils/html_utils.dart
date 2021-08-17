@@ -109,7 +109,8 @@ class HtmlUtils {
   /// Encodes an image (as a list of bytes) to a base64 embedded HTML image
   ///
   /// Pretty raw, I know, but it works
-  static String encodeImageAsEmbeddedBase64(String fileName, Uint8List imageBytes) {
+  static String encodeImageAsEmbeddedBase64(
+      String fileName, Uint8List imageBytes) {
     const imageWidth = '100%';
     final base64Image = '<img width="$imageWidth" src="data:image/png;base64, '
         '${base64Encode(imageBytes)}" data-filename="$fileName">';
@@ -158,7 +159,8 @@ class HtmlUtils {
     const newLine = '\n';
     const scriptOpenTag = '<script>';
     const scriptCloseTag = '</script>';
-    final jsContent = jsContents.reduce((prev, elem) => prev + newLine * 2 + elem);
+    final jsContent =
+        jsContents.reduce((prev, elem) => prev + newLine * 2 + elem);
 
     final whatToEmbed = newLine +
         scriptOpenTag +
@@ -181,9 +183,11 @@ class HtmlUtils {
   /// The way it works is that it will take the whole `htmlTag`, including
   /// it's attributes (if any), and it will append `toInject` to it, such as the original
   /// `htmlTag` will now have `toInject` as it's first child (by child we mean HTML DOM child)
-  static String injectAsChildOf(String htmlTag, String source, String toInject) {
+  static String injectAsChildOf(
+      String htmlTag, String source, String toInject) {
     final replaceSpot = '<$htmlTag([^>]*)>';
-    return source.replaceFirstMapped(RegExp(replaceSpot, caseSensitive: false), (match) {
+    return source.replaceFirstMapped(RegExp(replaceSpot, caseSensitive: false),
+        (match) {
       return '<$htmlTag${match.group(1)!}> \n$toInject';
     });
   }
@@ -226,7 +230,8 @@ class HtmlUtils {
   /// the last one of them. This is because the last one that renders on the screen
   /// will also call latter iframes' "connect_js_to_flutter" callbacks, thus messing up
   /// others' functions and, well, everything.
-  static String embedWebIframeJsConnector(String source, String windowDisambiguator) {
+  static String embedWebIframeJsConnector(
+      String source, String windowDisambiguator) {
     return embedJsInHtmlSource(
       source,
       {
@@ -255,7 +260,8 @@ class HtmlUtils {
   }
 
   /// Embeds click listeners inside the page and calls Dart callback when triggered
-  static String embedClickListenersInPageSource(String pageUrl, String pageSource) {
+  static String embedClickListenersInPageSource(
+      String pageUrl, String pageSource) {
     return embedInHtmlSource(
       source: pageSource,
       whatToEmbed: '''
