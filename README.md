@@ -186,7 +186,7 @@ While this package aims to put together the best of both worlds, there are diffe
 
 - Diferences between Web and Mobile behaviour:
 
-  See issues/
+  See [issues/#27](https://github.com/adrianflutur/webviewx/issues/27)
 
 - About content loading on Web
 
