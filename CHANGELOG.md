@@ -1,3 +1,13 @@
+## 0.2.1
+
+- Breaking change
+
+  - WebViewX width and height are now required (due to the fact that the web version always needs a width and a height)
+
+- Added the option to use hybrid composition for Android WebViews in `MobileSpecificParams`
+- Added a new public default CORS proxy service for Web
+- Update dependencies
+
 ## 0.2.0
 
 - Deprecated pedantic. Adopted lint instead.

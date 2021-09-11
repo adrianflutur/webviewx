@@ -80,6 +80,8 @@ class _WebViewXPageState extends State<WebViewXPage> {
       key: const ValueKey('webviewx'),
       initialContent: initialContent,
       initialSourceType: SourceType.html,
+      height: screenSize.height / 2,
+      width: min(screenSize.width * 0.8, 1024),
       onWebViewCreated: (controller) => webviewController = controller,
       onPageStarted: (src) =>
           debugPrint('A new page has started loading: $src\n'),
@@ -105,12 +107,13 @@ class _WebViewXPageState extends State<WebViewXPage> {
       webSpecificParams: const WebSpecificParams(
         printDebugInfo: true,
       ),
+      mobileSpecificParams: const MobileSpecificParams(
+        androidEnableHybridComposition: true,
+      ),
       navigationDelegate: (navigation) {
         debugPrint(navigation.content.sourceType.toString());
         return NavigationDecision.navigate;
       },
-      height: screenSize.height / 2,
-      width: min(screenSize.width * 0.8, 1024),
     );
   }
 

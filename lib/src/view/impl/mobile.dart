@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -32,11 +33,11 @@ class WebViewX extends StatefulWidget implements view_interface.WebViewX {
 
   /// Widget width
   @override
-  final double? width;
+  final double width;
 
   /// Widget height
   @override
-  final double? height;
+  final double height;
 
   /// Callback which returns a referrence to the [WebViewXController]
   /// being created.
@@ -111,8 +112,8 @@ class WebViewX extends StatefulWidget implements view_interface.WebViewX {
     this.initialContent = 'about:blank',
     this.initialSourceType = SourceType.url,
     this.userAgent,
-    this.width,
-    this.height,
+    required this.width,
+    required this.height,
     this.onWebViewCreated,
     this.jsContent = const {},
     this.dartCallBacks = const {},
@@ -141,6 +142,11 @@ class _WebViewXState extends State<WebViewX> {
   @override
   void initState() {
     super.initState();
+
+    if (Platform.isAndroid &&
+        widget.mobileSpecificParams.androidEnableHybridComposition) {
+      wf.WebView.platform = wf.SurfaceAndroidWebView();
+    }
 
     _ignoreAllGestures = widget.ignoreAllGestures;
     webViewXController = _createWebViewXController();
@@ -220,32 +226,30 @@ class _WebViewXState extends State<WebViewX> {
         )
         .toSet();
 
-    final webview = SizedBox(
+    return SizedBox(
       width: widget.width,
       height: widget.height,
-      child: wf.WebView(
-        key: widget.key,
-        initialUrl: _initialContent(),
-        javascriptMode: javascriptMode,
-        onWebViewCreated: onWebViewCreated,
-        javascriptChannels: javascriptChannels,
-        gestureRecognizers:
-            widget.mobileSpecificParams.mobileGestureRecognizers,
-        onPageStarted: widget.onPageStarted,
-        onPageFinished: widget.onPageFinished,
-        initialMediaPlaybackPolicy: initialMediaPlaybackPolicy,
-        onWebResourceError: onWebResourceError,
-        gestureNavigationEnabled:
-            widget.mobileSpecificParams.gestureNavigationEnabled,
-        debuggingEnabled: widget.mobileSpecificParams.debuggingEnabled,
-        navigationDelegate: navigationDelegate,
-        userAgent: widget.userAgent,
+      child: IgnorePointer(
+        ignoring: _ignoreAllGestures,
+        child: wf.WebView(
+          key: widget.key,
+          initialUrl: _initialContent(),
+          javascriptMode: javascriptMode,
+          onWebViewCreated: onWebViewCreated,
+          javascriptChannels: javascriptChannels,
+          gestureRecognizers:
+              widget.mobileSpecificParams.mobileGestureRecognizers,
+          onPageStarted: widget.onPageStarted,
+          onPageFinished: widget.onPageFinished,
+          initialMediaPlaybackPolicy: initialMediaPlaybackPolicy,
+          onWebResourceError: onWebResourceError,
+          gestureNavigationEnabled:
+              widget.mobileSpecificParams.gestureNavigationEnabled,
+          debuggingEnabled: widget.mobileSpecificParams.debuggingEnabled,
+          navigationDelegate: navigationDelegate,
+          userAgent: widget.userAgent,
+        ),
       ),
-    );
-
-    return IgnorePointer(
-      ignoring: _ignoreAllGestures,
-      child: webview,
     );
   }
 

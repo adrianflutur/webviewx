@@ -30,11 +30,11 @@ class WebViewX extends StatelessWidget implements view_interface.WebViewX {
 
   /// Widget width
   @override
-  final double? width;
+  final double width;
 
   /// Widget height
   @override
-  final double? height;
+  final double height;
 
   /// Callback which returns a referrence to the [WebViewXController]
   /// being created.
@@ -109,8 +109,8 @@ class WebViewX extends StatelessWidget implements view_interface.WebViewX {
     this.initialContent = 'about:blank',
     this.initialSourceType = SourceType.url,
     this.userAgent,
-    this.width,
-    this.height,
+    required this.width,
+    required this.height,
     this.onWebViewCreated,
     this.jsContent = const {},
     this.dartCallBacks = const {},
@@ -128,27 +128,25 @@ class WebViewX extends StatelessWidget implements view_interface.WebViewX {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(builder: (context, constraints) {
-      return mobile.WebViewX(
-        key: key,
-        initialContent: initialContent,
-        initialSourceType: initialSourceType,
-        userAgent: userAgent,
-        width: width ?? constraints.maxWidth,
-        height: height ?? constraints.maxHeight,
-        dartCallBacks: dartCallBacks,
-        jsContent: jsContent,
-        onWebViewCreated: onWebViewCreated,
-        ignoreAllGestures: ignoreAllGestures,
-        javascriptMode: javascriptMode,
-        initialMediaPlaybackPolicy: initialMediaPlaybackPolicy,
-        onPageStarted: onPageStarted,
-        onPageFinished: onPageFinished,
-        navigationDelegate: navigationDelegate,
-        onWebResourceError: onWebResourceError,
-        webSpecificParams: webSpecificParams,
-        mobileSpecificParams: mobileSpecificParams,
-      );
-    });
+    return mobile.WebViewX(
+      key: key,
+      initialContent: initialContent,
+      initialSourceType: initialSourceType,
+      userAgent: userAgent,
+      width: width,
+      height: height,
+      dartCallBacks: dartCallBacks,
+      jsContent: jsContent,
+      onWebViewCreated: onWebViewCreated,
+      ignoreAllGestures: ignoreAllGestures,
+      javascriptMode: javascriptMode,
+      initialMediaPlaybackPolicy: initialMediaPlaybackPolicy,
+      onPageStarted: onPageStarted,
+      onPageFinished: onPageFinished,
+      navigationDelegate: navigationDelegate,
+      onWebResourceError: onWebResourceError,
+      webSpecificParams: webSpecificParams,
+      mobileSpecificParams: mobileSpecificParams,
+    );
   }
 }

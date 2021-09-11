@@ -28,7 +28,7 @@ class WebViewXController extends ChangeNotifier
     required String initialContent,
     required SourceType initialSourceType,
     required bool ignoreAllGestures,
-  })   : _ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
+  })  : _ignoreAllGesturesNotifier = ValueNotifier(ignoreAllGestures),
         value = WebViewContent(
           source: initialContent,
           sourceType: initialSourceType,

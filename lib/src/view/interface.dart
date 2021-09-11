@@ -18,10 +18,10 @@ abstract class WebViewX {
   final String? userAgent;
 
   /// Widget width
-  final double? width;
+  final double width;
 
   /// Widget height
-  final double? height;
+  final double height;
 
   /// Callback which returns a referrence to the [IWebViewXController]
   /// being created.
@@ -82,8 +82,8 @@ abstract class WebViewX {
     this.initialContent = 'about:blank',
     this.initialSourceType = SourceType.url,
     this.userAgent,
-    this.width,
-    this.height,
+    required this.width,
+    required this.height,
     this.onWebViewCreated,
     this.jsContent = const {},
     this.dartCallBacks = const {},
