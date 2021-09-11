@@ -37,11 +37,11 @@ class WebViewX extends StatefulWidget implements view_interface.WebViewX {
 
   /// Widget width
   @override
-  final double? width;
+  final double width;
 
   /// Widget height
   @override
-  final double? height;
+  final double height;
 
   /// Callback which returns a referrence to the [WebViewXController]
   /// being created.
@@ -116,8 +116,8 @@ class WebViewX extends StatefulWidget implements view_interface.WebViewX {
     this.initialContent = 'about:blank',
     this.initialSourceType = SourceType.url,
     this.userAgent,
-    this.width,
-    this.height,
+    required this.width,
+    required this.height,
     this.onWebViewCreated,
     this.jsContent = const {},
     this.dartCallBacks = const {},
@@ -303,18 +303,25 @@ class _WebViewXState extends State<WebViewX> {
     final htmlElementView = SizedBox(
       width: widget.width,
       height: widget.height,
-      child: _htmlElement(iframeViewType),
+      child: AbsorbPointer(
+        child: RepaintBoundary(
+          child: HtmlElementView(
+            key: widget.key,
+            viewType: iframeViewType,
+          ),
+        ),
+      ),
     );
 
     return _iframeIgnorePointer(
-      child: htmlElementView,
       ignoring: _ignoreAllGestures,
+      child: htmlElementView,
     );
   }
 
   Widget _iframeIgnorePointer({
-    required Widget child,
     bool ignoring = false,
+    required Widget child,
   }) {
     return Stack(
       children: [
@@ -331,17 +338,6 @@ class _WebViewXState extends State<WebViewX> {
     );
   }
 
-  Widget _htmlElement(String iframeViewType) {
-    return AbsorbPointer(
-      child: RepaintBoundary(
-        child: HtmlElementView(
-          key: widget.key,
-          viewType: iframeViewType,
-        ),
-      ),
-    );
-  }
-
   // This creates a unique String to be used as the view type of the HtmlElementView
   String _createViewType() {
     return HtmlUtils.buildIframeViewType();
@@ -352,8 +348,8 @@ class _WebViewXState extends State<WebViewX> {
       ..id = 'id_$iframeViewType'
       ..name = 'name_$iframeViewType'
       ..style.border = 'none'
-      ..width = widget.width!.toInt().toString()
-      ..height = widget.height!.toInt().toString()
+      ..width = widget.width.toInt().toString()
+      ..height = widget.height.toInt().toString()
       ..allowFullscreen = widget.webSpecificParams.webAllowFullscreenContent;
 
     widget.webSpecificParams.additionalSandboxOptions.forEach(
@@ -553,7 +549,7 @@ class _WebViewXState extends State<WebViewX> {
       final proxy = proxyList[i];
       _debugLog('Using proxy: ${proxy.runtimeType}');
 
-      final proxiedUri = Uri.parse(proxy.buildProxyUrl(url));
+      final proxiedUri = Uri.parse(proxy.buildProxyUrl(Uri.encodeFull(url)));
 
       Future<http.Response> request;
 

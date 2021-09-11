@@ -10,6 +10,7 @@ abstract class BypassProxy {
   static const publicProxies = <BypassProxy>[
     BridgedBypassProxy(),
     CodeTabsBypassProxy(),
+    WeCorsAnyWhereProxy(),
   ];
 }
 
@@ -35,6 +36,21 @@ class CodeTabsBypassProxy implements BypassProxy {
   @override
   String buildProxyUrl(String pageUrl) {
     return 'https://api.codetabs.com/v1/proxy/?quest=$pageUrl';
+  }
+
+  @override
+  String extractPageSource(String responseBody) {
+    return responseBody;
+  }
+}
+
+/// we-cors-anywhere.herokuapp.com proxy
+class WeCorsAnyWhereProxy implements BypassProxy {
+  const WeCorsAnyWhereProxy();
+
+  @override
+  String buildProxyUrl(String pageUrl) {
+    return 'https://we-cors-anywhere.herokuapp.com/$pageUrl';
   }
 
   @override
