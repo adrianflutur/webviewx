@@ -167,6 +167,7 @@ class _WebViewXState extends State<WebViewX> {
             widget.initialContent == 'about:blank')) {
       _connectJsToFlutter(then: _callOnWebViewCreatedCallback);
     } else {
+      webViewXController.connector = js.context;
       _callOnWebViewCreatedCallback();
     }
 
