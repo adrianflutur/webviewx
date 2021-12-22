@@ -120,28 +120,27 @@ class _WebViewXPageState extends State<WebViewXPage> {
   void _setUrl() {
     webviewController.loadContent(
       'https://flutter.dev',
-      SourceType.url,
     );
   }
 
   void _setUrlBypass() {
     webviewController.loadContent(
       'https://news.ycombinator.com/',
-      SourceType.urlBypass,
+      sourceType: SourceType.urlBypass,
     );
   }
 
   void _setHtml() {
     webviewController.loadContent(
       initialContent,
-      SourceType.html,
+      sourceType: SourceType.html,
     );
   }
 
   void _setHtmlFromAssets() {
     webviewController.loadContent(
       'assets/test.html',
-      SourceType.html,
+      sourceType: SourceType.html,
       fromAssets: true,
     );
   }
