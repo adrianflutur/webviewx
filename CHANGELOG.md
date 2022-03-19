@@ -1,3 +1,7 @@
+## 0.2.3
+
+- (web) A custom BypassProxy can now also override the way a page is fetched. This includes the ability to use custom protocols or apis instead of a standard http request.
+
 ## 0.2.1
 
 - Breaking change

@@ -5,7 +5,6 @@ import 'dart:js' as js;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 import 'package:webviewx/src/utils/dart_ui_fix.dart' as ui;
@@ -549,19 +548,13 @@ class _WebViewXState extends State<WebViewX> {
       final proxy = proxyList[i];
       _debugLog('Using proxy: ${proxy.runtimeType}');
 
-      final proxiedUri = Uri.parse(proxy.buildProxyUrl(Uri.encodeFull(url)));
-
-      Future<http.Response> request;
-
-      if (method == 'get') {
-        request = http.get(proxiedUri, headers: headers);
-      } else {
-        request = http.post(proxiedUri, headers: headers, body: body);
-      }
-
       try {
-        final response = await request;
-        return proxy.extractPageSource(response.body);
+        return proxy.fetchPageSource(
+          method: method,
+          url: url,
+          headers: headers,
+          body: body,
+        );
       } catch (e) {
         _debugLog(
           'Failed to fetch the page at $url from proxy ${proxy.runtimeType}.',
