@@ -1,3 +1,8 @@
+## 0.3.0
+
+- Update webview_flutter to 3.0.0
+- Controller loadContent method now have default url sourceType 
+
 ## 0.2.1
 
 - Breaking change

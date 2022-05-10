@@ -39,8 +39,8 @@ abstract class WebViewXController<T> {
   /// `body` is only used on the WEB version, when clicking on a submit button in a form
   ///
   Future<void> loadContent(
-    String content,
-    SourceType sourceType, {
+    String content, {
+    SourceType sourceType = SourceType.url,
     Map<String, String>? headers,
     Object? body,
     bool fromAssets = false,
