@@ -3,11 +3,8 @@ import 'dart:async' show Future;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:webview_flutter/webview_flutter.dart' as wf;
-import 'package:webviewx/src/utils/html_utils.dart';
-import 'package:webviewx/src/utils/source_type.dart';
-import 'package:webviewx/src/utils/utils.dart';
-
 import 'package:webviewx/src/controller/interface.dart' as i;
+import 'package:webviewx/src/utils/utils.dart';
 
 /// Mobile implementation
 class WebViewXController extends ChangeNotifier
@@ -121,7 +118,7 @@ class WebViewXController extends ChangeNotifier
   ) async {
     // This basically will transform a "raw" call (evaluateJavascript)
     // into a little bit more "typed" call, that is - calling a method.
-    final result = await connector.evaluateJavascript(
+    final result = await connector.runJavascriptReturningResult(
       HtmlUtils.buildJsFunction(name, params),
     );
 
@@ -144,7 +141,7 @@ class WebViewXController extends ChangeNotifier
     String rawJavascript, {
     bool inGlobalContext = false, // NO-OP HERE
   }) {
-    return connector.evaluateJavascript(rawJavascript);
+    return connector.runJavascriptReturningResult(rawJavascript);
   }
 
   /// Returns the current content
