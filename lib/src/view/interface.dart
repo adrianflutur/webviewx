@@ -1,5 +1,5 @@
-import 'package:webviewx/src/utils/utils.dart';
 import 'package:webviewx/src/controller/interface.dart';
+import 'package:webviewx/src/utils/utils.dart';
 
 /// Interface for widget
 abstract class WebViewX {

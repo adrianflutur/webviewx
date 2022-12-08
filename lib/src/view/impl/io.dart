@@ -1,11 +1,8 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:webviewx/src/utils/utils.dart';
-
-import 'package:webviewx/src/view/interface.dart' as view_interface;
 import 'package:webviewx/src/controller/interface.dart' as ctrl_interface;
-
+import 'package:webviewx/src/utils/utils.dart';
 import 'package:webviewx/src/view/impl/mobile.dart' as mobile;
+import 'package:webviewx/src/view/interface.dart' as view_interface;
 
 /// IO implementation
 ///
