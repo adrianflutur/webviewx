@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:webviewx/src/utils/utils.dart';
 import 'package:webviewx/src/controller/interface.dart' as ctrl_interface;
+import 'package:webviewx/src/utils/utils.dart';
 import 'package:webviewx/src/view/interface.dart' as view_interface;
 
 /// Facade class
@@ -30,7 +30,7 @@ class WebViewX extends StatelessWidget implements view_interface.WebViewX {
   @override
   final double height;
 
-  /// Callback which returns a referrence to the [WebViewXController]
+  /// Callback which returns a reference to the [WebViewXController]
   /// being created.
   @override
   final Function(ctrl_interface.WebViewXController controller)?

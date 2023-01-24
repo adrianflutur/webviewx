@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 import 'package:webviewx/src/utils/constants.dart';
@@ -17,12 +18,13 @@ enum EmbedPosition {
 class HtmlUtils {
   /// Checks if the source looks like HTML
   static bool isFullHtmlPage(String src) {
-    final _src = src.trim().toLowerCase();
-    return _src.startsWith(RegExp('<!DOCTYPE html>', caseSensitive: false)) &&
+    final trimmedSrc = src.trim().toLowerCase();
+    return trimmedSrc
+            .startsWith(RegExp('<!DOCTYPE html>', caseSensitive: false)) &&
         // I didn't forget the closing bracket here.
         // Html opening tag may also have some random attributes.
-        _src.contains(RegExp('<html', caseSensitive: false)) &&
-        _src.contains(RegExp('</html>', caseSensitive: false));
+        trimmedSrc.contains(RegExp('<html', caseSensitive: false)) &&
+        trimmedSrc.contains(RegExp('</html>', caseSensitive: false));
   }
 
   /// Wraps markup in HTML tags
@@ -54,14 +56,14 @@ class HtmlUtils {
     bool encodeHtml = false,
     String? windowDisambiguator,
   }) {
-    var _src = src;
+    var trimmedSrc = src;
 
-    if (!isFullHtmlPage(_src)) {
-      _src = wrapHtml(_src, windowDisambiguator);
+    if (!isFullHtmlPage(trimmedSrc)) {
+      trimmedSrc = wrapHtml(trimmedSrc, windowDisambiguator);
     }
 
     if (forWeb) {
-      _src = embedWebIframeJsConnector(_src, windowDisambiguator!);
+      trimmedSrc = embedWebIframeJsConnector(trimmedSrc, windowDisambiguator!);
     }
 
     if (jsContent.isNotEmpty) {
@@ -77,14 +79,14 @@ class HtmlUtils {
           }
         }
       }
-      _src = embedJsInHtmlSource(_src, jsContentStrings);
+      trimmedSrc = embedJsInHtmlSource(trimmedSrc, jsContentStrings);
     }
 
     if (encodeHtml) {
-      _src = encodeHtmlToURI(_src);
+      trimmedSrc = encodeHtmlToURI(trimmedSrc);
     }
 
-    return _src;
+    return trimmedSrc;
   }
 
   /// Encodes HTML to URI

@@ -1,16 +1,13 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:webviewx/src/utils/utils.dart';
-
 import 'package:webview_flutter/platform_interface.dart' as wf_pi;
 import 'package:webview_flutter/webview_flutter.dart' as wf;
-
-import 'package:webviewx/src/view/interface.dart' as view_interface;
-import 'package:webviewx/src/controller/interface.dart' as ctrl_interface;
 import 'package:webviewx/src/controller/impl/mobile.dart';
+import 'package:webviewx/src/controller/interface.dart' as ctrl_interface;
+import 'package:webviewx/src/utils/utils.dart';
+import 'package:webviewx/src/view/interface.dart' as view_interface;
 
 /// Mobile implementation
 class WebViewX extends StatefulWidget implements view_interface.WebViewX {
@@ -39,7 +36,7 @@ class WebViewX extends StatefulWidget implements view_interface.WebViewX {
   @override
   final double height;
 
-  /// Callback which returns a referrence to the [WebViewXController]
+  /// Callback which returns a reference to the [WebViewXController]
   /// being created.
   @override
   final Function(ctrl_interface.WebViewXController controller)?
@@ -130,10 +127,10 @@ class WebViewX extends StatefulWidget implements view_interface.WebViewX {
   }) : super(key: key);
 
   @override
-  _WebViewXState createState() => _WebViewXState();
+  WebViewXState createState() => WebViewXState();
 }
 
-class _WebViewXState extends State<WebViewX> {
+class WebViewXState extends State<WebViewX> {
   late wf.WebViewController originalWebViewController;
   late WebViewXController webViewXController;
 
@@ -211,7 +208,7 @@ class _WebViewXState extends State<WebViewX> {
       originalWebViewController = webViewController;
 
       webViewXController.connector = originalWebViewController;
-      // Calls onWebViewCreated to pass the refference upstream
+      // Calls onWebViewCreated to pass the reference upstream
       if (widget.onWebViewCreated != null) {
         widget.onWebViewCreated!(webViewXController);
       }
