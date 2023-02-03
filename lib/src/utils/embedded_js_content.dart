@@ -79,6 +79,6 @@ class EmbeddedJsContent {
           js != null || (js == null && mobileJs != null && webJs != null),
           'Choose whether to use globally available js (like console.log), '
           'or platform specific(functions, callbacks, etc; For this, you must fill in '
-          'the coresponding function for all platforms)',
+          'the corresponding function for all platforms)',
         );
 }

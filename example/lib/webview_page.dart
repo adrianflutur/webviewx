@@ -11,10 +11,10 @@ class WebViewXPage extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  _WebViewXPageState createState() => _WebViewXPageState();
+  WebViewXPageState createState() => WebViewXPageState();
 }
 
-class _WebViewXPageState extends State<WebViewXPage> {
+class WebViewXPageState extends State<WebViewXPage> {
   late WebViewXController webviewController;
   final initialContent =
       '<h4> This is some hardcoded HTML code embedded inside the webview <h4> <h2> Hello world! <h2>';
@@ -59,7 +59,7 @@ class _WebViewXPageState extends State<WebViewXPage> {
               ),
               Expanded(
                 child: Scrollbar(
-                  isAlwaysShown: true,
+                  thumbVisibility: true,
                   child: SizedBox(
                     width: min(screenSize.width * 0.8, 512),
                     child: ListView(

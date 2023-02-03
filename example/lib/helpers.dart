@@ -14,7 +14,7 @@ void showAlertDialog(String content, BuildContext context) {
       child: AlertDialog(
         content: Text(content),
         actions: [
-          TextButton(
+          ElevatedButton(
             onPressed: Navigator.of(context).pop,
             child: const Text('Close'),
           ),

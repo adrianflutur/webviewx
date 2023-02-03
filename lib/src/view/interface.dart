@@ -1,5 +1,5 @@
-import 'package:webviewx/src/utils/utils.dart';
 import 'package:webviewx/src/controller/interface.dart';
+import 'package:webviewx/src/utils/utils.dart';
 
 /// Interface for widget
 abstract class WebViewX {
@@ -23,7 +23,7 @@ abstract class WebViewX {
   /// Widget height
   final double height;
 
-  /// Callback which returns a referrence to the [IWebViewXController]
+  /// Callback which returns a reference to the [IWebViewXController]
   /// being created.
   final Function(WebViewXController controller)? onWebViewCreated;
 
