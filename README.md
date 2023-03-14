@@ -1,6 +1,23 @@
+<div> 
+<h1 align="center">ARCHIVED</h1>
+<h3>This package has been archived and will not be maintained anymore. There are several reasons for why I had to make this decision.
+<br><br>
+This package was initially built as a proof of concept of how would a crossplatform webview work and look like. It was supposed to be used for loading static documents, for creating WYSIWYG editors, or things alike. And it worked (and still works!) fine for that purpose, but it still feels a bit clucky since not every feature can be implemented on all platforms. Like I said, a proof of concept.
+<br><br>
+But then I wanted to make the web version similar to the mobile version and that was the moment I made the big mistake of allowing the package to bypass websites' iframe policies using *PUBLIC* third party cors proxy servers.
+<br><br>
+After that, people started to use this package to load their auth forms/bank/paypal payment pages, etc. through *PUBLIC* proxies, which is very unsafe. I tried to explain in the issues that this is not a good idea, but issues regarding auth and similar topics kept popping up.
+<br><br>
+I should have done this a while ago, but I have to admit that lately I have been rather busy with other projects and didn't have much time for OSS. 
+<br>
+Thank you everyone.
+</h3>
+</div>
+
 <p align="center">
 <img src="https://raw.githubusercontent.com/adrianflutur/webviewx/master/doc/images/webviewx_logo.png" height="400" alt="webviewx" />
 </p>
+
 
 [![pub package](https://shields.io/pub/v/webviewx.svg?style=flat-square&color=blue)](https://pub.dev/packages/webviewx)
 
