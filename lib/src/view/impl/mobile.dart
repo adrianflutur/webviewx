@@ -163,18 +163,25 @@ class _WebViewXState extends State<WebViewX> {
         ? wf.AutoMediaPlaybackPolicy.always_allow
         : wf.AutoMediaPlaybackPolicy.require_user_action_for_all_media_types;
 
-    void onWebResourceError(wf_pi.WebResourceError err) =>
+      void onWebResourceError(wf_pi.WebResourceError err) {
+        WebResourceErrorType? errorType;
+        try {
+          errorType = WebResourceErrorType.values.singleWhere(
+            (value) => value.toString() == err.errorType.toString(),
+          );
+        } catch (error) {
+          errorType = null;
+        }
         widget.onWebResourceError!(
           WebResourceError(
             description: err.description,
             errorCode: err.errorCode,
             domain: err.domain,
-            errorType: WebResourceErrorType.values.singleWhere(
-              (value) => value.toString() == err.errorType.toString(),
-            ),
+            errorType: errorType,
             failingUrl: err.failingUrl,
           ),
         );
+    }
 
     FutureOr<wf.NavigationDecision> navigationDelegate(
       wf.NavigationRequest request,
