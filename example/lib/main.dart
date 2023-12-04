@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'webview_page.dart';
+import 'package:webviewx_example/webview_page.dart';
 
 void main() {
   runApp(const MyApp());

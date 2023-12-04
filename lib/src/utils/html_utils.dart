@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_classes_with_only_static_members, no_leading_underscores_for_local_identifiers
+
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:path/path.dart' as p;
@@ -110,7 +112,9 @@ class HtmlUtils {
   ///
   /// Pretty raw, I know, but it works
   static String encodeImageAsEmbeddedBase64(
-      String fileName, Uint8List imageBytes) {
+    String fileName,
+    Uint8List imageBytes,
+  ) {
     const imageWidth = '100%';
     final base64Image = '<img width="$imageWidth" src="data:image/png;base64, '
         '${base64Encode(imageBytes)}" data-filename="$fileName">';
@@ -184,7 +188,10 @@ class HtmlUtils {
   /// it's attributes (if any), and it will append `toInject` to it, such as the original
   /// `htmlTag` will now have `toInject` as it's first child (by child we mean HTML DOM child)
   static String injectAsChildOf(
-      String htmlTag, String source, String toInject) {
+    String htmlTag,
+    String source,
+    String toInject,
+  ) {
     final replaceSpot = '<$htmlTag([^>]*)>';
     return source.replaceFirstMapped(RegExp(replaceSpot, caseSensitive: false),
         (match) {
@@ -231,11 +238,13 @@ class HtmlUtils {
   /// will also call latter iframes' "connect_js_to_flutter" callbacks, thus messing up
   /// others' functions and, well, everything.
   static String embedWebIframeJsConnector(
-      String source, String windowDisambiguator) {
+    String source,
+    String windowDisambiguator,
+  ) {
     return embedJsInHtmlSource(
       source,
       {
-        'parent.$jsToDartConnectorFN$windowDisambiguator && parent.$jsToDartConnectorFN$windowDisambiguator(window)'
+        'parent.$jsToDartConnectorFN$windowDisambiguator && parent.$jsToDartConnectorFN$windowDisambiguator(window)',
       },
       position: EmbedPosition.aboveHeadCloseTag,
     );
@@ -261,7 +270,9 @@ class HtmlUtils {
 
   /// Embeds click listeners inside the page and calls Dart callback when triggered
   static String embedClickListenersInPageSource(
-      String pageUrl, String pageSource) {
+    String pageUrl,
+    String pageSource,
+  ) {
     return embedInHtmlSource(
       source: pageSource,
       whatToEmbed: '''

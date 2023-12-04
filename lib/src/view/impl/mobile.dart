@@ -105,7 +105,7 @@ class WebViewX extends StatefulWidget implements view_interface.WebViewX {
 
   /// Constructor
   const WebViewX({
-    Key? key,
+    super.key,
     this.initialContent = 'about:blank',
     this.initialSourceType = SourceType.url,
     this.userAgent,
@@ -124,10 +124,10 @@ class WebViewX extends StatefulWidget implements view_interface.WebViewX {
     this.onWebResourceError,
     this.webSpecificParams = const WebSpecificParams(),
     this.mobileSpecificParams = const MobileSpecificParams(),
-  }) : super(key: key);
+  });
 
   @override
-  _WebViewXState createState() => _WebViewXState();
+  State<WebViewX> createState() => _WebViewXState();
 }
 
 class _WebViewXState extends State<WebViewX> {
@@ -185,7 +185,9 @@ class _WebViewXState extends State<WebViewX> {
       final delegate = await widget.navigationDelegate!.call(
         NavigationRequest(
           content: NavigationContent(
-              request.url, webViewXController.value.sourceType),
+            request.url,
+            webViewXController.value.sourceType,
+          ),
           isForMainFrame: request.isForMainFrame,
         ),
       );
@@ -210,7 +212,7 @@ class _WebViewXState extends State<WebViewX> {
       webViewXController.connector = originalWebViewController;
       // Calls onWebViewCreated to pass the refference upstream
       if (widget.onWebViewCreated != null) {
-        widget.onWebViewCreated!(webViewXController);
+        widget.onWebViewCreated?.call(webViewXController);
       }
     }
 

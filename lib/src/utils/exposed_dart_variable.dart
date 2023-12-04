@@ -1,3 +1,4 @@
+// ignore_for_file: dangling_library_doc_comments
 /// TODO
 /// This will (maybe, eventually) be used in order to expose a Dart variable to JS at startup
 /// The variable could then be used from the JS side.

@@ -14,10 +14,10 @@ class WebViewAware extends StatelessWidget {
 
   /// Constructor
   const WebViewAware({
-    Key? key,
+    super.key,
     required this.child,
     this.debug = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_dynamic_calls
+
 import 'dart:async' show Future;
 // ignore: avoid_web_libraries_in_flutter
 import 'dart:js' as js;
@@ -87,10 +89,10 @@ class WebViewXController extends ChangeNotifier
     WebViewContent newContent;
 
     if (fromAssets) {
-      final _contentFromAssets = await rootBundle.loadString(content);
+      final contentFromAssets = await rootBundle.loadString(content);
 
       newContent = WebViewContent(
-        source: _contentFromAssets,
+        source: contentFromAssets,
         sourceType: sourceType,
         headers: headers,
         webPostRequestBody: body,
@@ -168,7 +170,7 @@ class WebViewXController extends ChangeNotifier
   @override
   Future<void> goBack() async {
     _history.moveBack();
-    log('Current history: ${_history.toString()}');
+    log('Current history: $_history');
 
     _notifyWidget();
   }
@@ -184,7 +186,7 @@ class WebViewXController extends ChangeNotifier
   @override
   Future<void> goForward() async {
     _history.moveForward();
-    log('Current history: ${_history.toString()}');
+    log('Current history: $_history');
 
     _notifyWidget();
   }

@@ -77,10 +77,10 @@ class WebViewXController extends ChangeNotifier
     bool fromAssets = false,
   }) async {
     if (fromAssets) {
-      final _content = await rootBundle.loadString(content);
+      final loadedContent = await rootBundle.loadString(content);
 
       value = WebViewContent(
-        source: _content,
+        source: loadedContent,
         sourceType: sourceType,
         headers: headers,
       );
