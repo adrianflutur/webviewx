@@ -1,7 +1,14 @@
+## 0.2.3
+
+- This package has been deprecated
+
+## 0.2.2
+
+- Archive repository and end support for package
+
 ## 0.2.1
 
 - Breaking change
-
   - WebViewX width and height are now required (due to the fact that the web version always needs a width and a height)
 
 - Added the option to use hybrid composition for Android WebViews in `MobileSpecificParams`
