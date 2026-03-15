@@ -1,4 +1,6 @@
 import 'dart:async' show Future;
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
@@ -127,9 +129,17 @@ class WebViewXController extends ChangeNotifier
 
     // (MOBILE ONLY) Unquotes response if necessary
     //
-    // In the mobile version responses from Js to Dart come wrapped in single quotes (')
-    // The web works fine because it is already into it's native environment
-    return HtmlUtils.unQuoteJsResponseIfNeeded(result);
+    // The web works fine because it is already into its native environment
+    // but on mobile we need to parse the result
+    if (Platform.isAndroid) {
+      // On Android `result` will be JSON, so we decode it
+      return json.decode(result);
+    } else {
+      /// TODO: make sure this works on iOS
+      // In the iOS version responses from JS to Dart come wrapped in single quotes (')
+      // Note that the supported types are more limited because of connector.evaluateJavascript
+      return HtmlUtils.unQuoteJsResponseIfNeeded(result);
+    }
   }
 
   /// This function allows you to evaluate 'raw' javascript (e.g: 2+2)

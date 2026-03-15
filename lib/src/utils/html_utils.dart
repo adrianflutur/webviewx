@@ -134,7 +134,10 @@ class HtmlUtils {
     }
 
     for (final param in params) {
-      args.write(addSingleQuotes(param.toString()));
+      // Encode JSON from param
+      // For example, strings will be encoded so JavaScript reads them exactly
+      // as on Dart
+      args.write(json.encode(param));
       args.write(',');
     }
 
@@ -142,11 +145,6 @@ class HtmlUtils {
     final function = '$name($noEndingCommaArgs)';
 
     return function;
-  }
-
-  /// Adds single quotes to the param
-  static String addSingleQuotes(String data) {
-    return "'$data'";
   }
 
   /// Embeds js in the HTML source at the specified position
